@@ -1,0 +1,278 @@
+/* Login page moderno para Margarita Village */
+
+.login-root {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow: hidden;
+  background: radial-gradient(circle at top left, rgba(232, 99, 42, 0.25), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(35, 65, 117, 0.18), transparent 22%),
+    linear-gradient(180deg, #f8fbff 0%, #e5ecf5 100%);
+}
+
+.login-root::before,
+.login-root::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(86px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.login-root::before {
+  top: 8%;
+  left: 8%;
+  width: 320px;
+  height: 320px;
+  background: rgba(232, 99, 42, 0.22);
+}
+
+.login-root::after {
+  bottom: -6%;
+  right: 6%;
+  width: 420px;
+  height: 420px;
+  background: rgba(35, 65, 117, 0.16);
+}
+
+.login-card {
+  width: min(100%, 1040px);
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2px;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: var(--sombra-card);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  position: relative;
+  z-index: 2;
+}
+
+.login-card-side {
+  position: relative;
+  padding: 54px 46px;
+  background: linear-gradient(180deg, #203b6e 0%, #1a335c 100%);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-card-side::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(232, 99, 42, 0.18), transparent 34%);
+  pointer-events: none;
+}
+
+.login-card-side > * {
+  position: relative;
+  z-index: 1;
+}
+
+.login-side-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 26px;
+}
+
+.login-card-side h1 {
+  font-size: clamp(2.3rem, 4vw, 3.6rem);
+  line-height: 1.02;
+  margin: 0;
+}
+
+.login-card-side h1 span {
+  color: var(--naranja);
+}
+
+.login-card-side p {
+  margin: 28px 0 36px;
+  max-width: 460px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.login-side-stats {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.login-side-stats div {
+  flex: 1;
+  min-width: 138px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.login-side-stats strong {
+  display: block;
+  font-size: 1.55rem;
+  color: #ffffff;
+}
+
+.login-side-stats span {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+}
+
+.login-side-floating {
+  margin-top: auto;
+  padding: 22px 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.login-side-floating span {
+  display: block;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.login-side-floating small {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.6;
+}
+
+.login-card-form {
+  padding: 46px 42px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 34px;
+}
+
+.login-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 18px;
+  border: 1px solid var(--borde);
+  padding: 10px;
+  background: #ffffff;
+}
+
+.form-header h2 {
+  margin: 0 0 6px;
+  font-size: clamp(1.9rem, 2.4vw, 2.3rem);
+  color: var(--azul);
+}
+
+.form-header p {
+  margin: 0;
+  color: var(--texto-mut);
+}
+
+.login-error {
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--rojo);
+  border: 1px solid rgba(220, 38, 38, 0.18);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.input-field {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--borde);
+  background: var(--bg-input);
+  color: var(--texto);
+  font-size: 0.95rem;
+}
+
+.login-submit {
+  margin-top: 14px;
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 1rem;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, var(--azul), var(--azul-hover));
+  color: #ffffff;
+  box-shadow: 0 18px 32px rgba(35, 65, 117, 0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.login-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 38px rgba(35, 65, 117, 0.22);
+}
+
+@media (max-width: 900px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card-side {
+    padding: 36px 28px;
+  }
+
+  .login-card-form {
+    padding: 36px 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-root {
+    padding: 24px 16px;
+  }
+
+  .login-card-side h1 {
+    font-size: 2.15rem;
+  }
+
+  .login-card-side,
+  .login-card-form {
+    border-radius: 24px;
+  }
+
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,9 @@
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px }
+.card { background: white; padding: 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.04) }
+.card strong { font-size: 20px }
+.recientes table { width: 100%; border-collapse: collapse; background: white }
+.recientes th, .recientes td { padding: 8px 10px; border-bottom: 1px solid #f0f3f7 }
+.badge { padding: 4px 8px; border-radius: 12px; font-size: 12px }
+.badge.en-revision { background: #fef3c7 }
+.badge.seleccionado { background: #bbf7d0 }
+.badge.citado { background: #bfdbfe }

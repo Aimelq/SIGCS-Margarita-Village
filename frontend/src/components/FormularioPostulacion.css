@@ -1,0 +1,144 @@
+.form-container {
+  background: var(--bg-card);
+  border: 1px solid var(--borde);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: var(--sombra-card);
+}
+
+/* ---- STEPPER ---- */
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.stepper::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background: var(--borde);
+  z-index: 0;
+}
+
+.step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  padding: 0 10px;
+}
+
+.step-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-main);
+  border: 2px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--texto-mut);
+  transition: all 0.3s;
+}
+
+.step.active .step-circle {
+  border-color: var(--azul);
+  background: var(--azul);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(35, 65, 117, 0.2);
+}
+
+.step.completed .step-circle {
+  border-color: var(--azul);
+  background: var(--bg-main);
+  color: var(--azul);
+}
+
+.step-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-mut);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.step.active .step-label {
+  color: var(--azul);
+}
+
+/* ---- GRIDS DEL FORMULARIO ---- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+.full-width {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- ZONA DE DROP PARA CV ---- */
+.cv-upload-box {
+  border: 2px dashed var(--borde);
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: var(--bg-main);
+  margin-top: 10px;
+}
+
+.cv-upload-box:hover {
+  border-color: var(--azul);
+  background: rgba(35, 65, 117, 0.02);
+}
+
+.cv-upload-box.has-file {
+  border-color: var(--verde);
+  border-style: solid;
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.cv-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.cv-text {
+  font-size: 15px;
+  color: var(--azul);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.cv-subtext {
+  font-size: 13px;
+  color: var(--texto-mut);
+}
+
+/* ---- BOTONES DEL FORMULARIO ---- */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--borde);
+}

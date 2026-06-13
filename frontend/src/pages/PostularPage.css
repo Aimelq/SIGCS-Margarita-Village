@@ -1,0 +1,138 @@
+.postular-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 60px 24px;
+  background: var(--bg-main);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(35, 65, 117, 0.05), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(232, 99, 42, 0.05), transparent 25%);
+}
+
+.postular-header {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.postular-logo {
+  height: 60px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.postular-logo:hover {
+  transform: scale(1.05);
+}
+
+/* ---- CAJA DE CEDULA ---- */
+.cedula-box {
+  background: var(--bg-card);
+  border: 1px solid var(--borde);
+  border-radius: 24px;
+  padding: 48px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+
+.cedula-logo {
+  height: 50px;
+  margin-bottom: 32px;
+  cursor: pointer;
+}
+
+.cedula-titulo {
+  font-size: 28px;
+  color: var(--azul);
+}
+
+.cedula-desc {
+  font-size: 15px;
+  margin-bottom: 32px;
+  line-height: 1.5;
+  color: var(--texto-mut);
+}
+
+.input-cedula {
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  padding: 16px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--texto-mut);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: color 0.2s;
+}
+.btn-link:hover {
+  color: var(--azul);
+}
+
+/* ---- BANNERS ---- */
+.banner-nuevo, .banner-existente {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  box-shadow: var(--sombra-card);
+}
+
+.banner-nuevo {
+  background: rgba(234, 88, 12, 0.05);
+  border: 1px solid rgba(234, 88, 12, 0.2);
+}
+
+.banner-existente {
+  background: rgba(22, 163, 74, 0.05);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.banner-icono {
+  font-size: 32px;
+}
+.banner-nuevo strong { color: var(--naranja); display: block; margin-bottom: 4px;}
+.banner-existente strong { color: var(--verde); display: block; margin-bottom: 4px; }
+.banner-nuevo p, .banner-existente p { font-size: 14px; margin: 0; color: var(--texto); }
+
+/* ---- CONFIRMACION ---- */
+.confirmacion {
+  background: var(--bg-card);
+  border: 1px solid var(--borde);
+  border-radius: 24px;
+  padding: 60px 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--sombra-card);
+  margin: auto;
+}
+
+.confirmacion-icono {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.confirmacion h2 {
+  color: var(--azul);
+  font-size: 28px;
+}

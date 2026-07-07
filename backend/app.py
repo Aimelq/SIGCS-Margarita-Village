@@ -49,6 +49,9 @@ def get_db():
 def requiere_token(f):
     @wraps(f)
     def decorador(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return f(*args, **kwargs)
+            
         auth_header = request.headers.get("Authorization", "")
         if not auth_header.startswith("Bearer "):
             return jsonify({"error": "Token requerido"}), 401
@@ -119,7 +122,7 @@ def login():
 
     # Genero el token con expiración de 8 horas
     payload = {
-        "sub": usuario_id,
+        "sub": str(usuario_id),
         "email": usuario_email,
         "nombre": nombre,
         "rol": rol,
@@ -409,6 +412,242 @@ def subir_cv(cedula):
             conn.commit()
 
     return jsonify({"mensaje": "CV subido y registrado correctamente"}), 201
+
+
+# ============================================================
+# ENDPOINTS PARA EL PANEL INTERNO (SPRINT 3 Y 4)
+# ============================================================
+
+# ------------------------------------------------------------
+# GET /api/candidatos?q=<texto>
+# Buscador maestro de candidatos (protegido por token).
+# Permite a los reclutadores buscar por cédula, nombre o apellido.
+# Usa ILIKE en PostgreSQL para hacer una búsqueda parcial insensible 
+# a mayúsculas y minúsculas.
+# ------------------------------------------------------------
+@app.route("/api/candidatos", methods=["GET"])
+@requiere_token
+def buscar_candidatos():
+    # Obtengo el término de búsqueda de los parámetros de la URL (?q=...)
+    q = request.args.get("q", "").strip()
+    
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            # Si no hay término de búsqueda, retorno lista vacía
+            if not q:
+                return jsonify([]), 200
+                
+            # Construyo el patrón de búsqueda para ILIKE usando % (comodín)
+            # Ej: si q='perez', buscará '%perez%' (cualquier cosa antes o después)
+            patron = f"%{q}%"
+            
+            # Ejecuto la consulta buscando coincidencias en cédula, nombre o apellido.
+            # Uso un LEFT JOIN con postulaciones para obtener el cargo solicitado.
+            # LIMIT 20 previene devolver demasiados resultados si la búsqueda es muy general.
+            cur.execute("""
+                SELECT a.cedula, a.nombre, a.apellido, 
+                       p.empleo_solicitado, a.estado_actual
+                FROM aspirantes a
+                LEFT JOIN postulaciones p ON p.aspirante_id = a.id
+                WHERE a.cedula ILIKE %s OR a.nombre ILIKE %s OR a.apellido ILIKE %s
+                ORDER BY a.created_at DESC
+                LIMIT 20
+            """, (patron, patron, patron))
+            
+            filas = cur.fetchall()
+            
+    # Formateo los resultados en una lista de diccionarios JSON
+    columnas = ["cedula", "nombre", "apellido", "empleo_solicitado", "estado_actual"]
+    resultado = [dict(zip(columnas, fila)) for fila in filas]
+    
+    return jsonify(resultado), 200
+
+
+# ------------------------------------------------------------
+# GET /api/aspirantes/<cedula>/expediente
+# Retorna el perfil COMPLETO del aspirante, incluyendo todas
+# sus postulaciones, documentos, historial y evaluaciones.
+# Esto es para la vista detallada del candidato en el dashboard.
+# ------------------------------------------------------------
+@app.route("/api/aspirantes/<cedula>/expediente", methods=["GET"])
+@requiere_token
+def obtener_expediente(cedula):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            # 1. Obtengo los datos básicos del aspirante
+            cur.execute("""
+                SELECT id, cedula, nombre, apellido, correo, telefono,
+                       direccion, fecha_nacimiento, formacion, experiencia,
+                       estado_actual, edad, sexo, lugar_nacimiento, created_at
+                FROM aspirantes
+                WHERE cedula = %s
+            """, (cedula,))
+            
+            fila_aspirante = cur.fetchone()
+            if not fila_aspirante:
+                return jsonify({"error": "Candidato no encontrado"}), 404
+                
+            columnas_asp = [
+                "id", "cedula", "nombre", "apellido", "correo", "telefono",
+                "direccion", "fecha_nacimiento", "formacion", "experiencia",
+                "estado_actual", "edad", "sexo", "lugar_nacimiento", "created_at"
+            ]
+            aspirante = dict(zip(columnas_asp, fila_aspirante))
+            if aspirante["fecha_nacimiento"]:
+                aspirante["fecha_nacimiento"] = str(aspirante["fecha_nacimiento"])
+            aspirante["created_at"] = str(aspirante["created_at"])
+            
+            aspirante_id = aspirante["id"]
+            
+            # 2. Obtengo las postulaciones asociadas a este aspirante
+            cur.execute("""
+                SELECT id, fecha_solicitud, empleo_solicitado, sueldo_aspira,
+                       motivacion, habilidades, fortalezas, experiencia_ultimos_empleos,
+                       referencias, disponibilidad_rotativa, disponibilidad_fines,
+                       municipio, estado_civil, carga_familiar, medio_transporte,
+                       trabaja_actualmente, monto_superior_aspira
+                FROM postulaciones
+                WHERE aspirante_id = %s
+                ORDER BY fecha_solicitud DESC
+            """, (aspirante_id,))
+            
+            columnas_post = [
+                "id", "fecha_solicitud", "empleo_solicitado", "sueldo_aspira",
+                "motivacion", "habilidades", "fortalezas", "experiencia_ultimos_empleos",
+                "referencias", "disponibilidad_rotativa", "disponibilidad_fines",
+                "municipio", "estado_civil", "carga_familiar", "medio_transporte",
+                "trabaja_actualmente", "monto_superior_aspira"
+            ]
+            
+            # Guardo todas las postulaciones en una lista
+            postulaciones = []
+            for fila in cur.fetchall():
+                post = dict(zip(columnas_post, fila))
+                if post["fecha_solicitud"]:
+                    post["fecha_solicitud"] = str(post["fecha_solicitud"])
+                postulaciones.append(post)
+                
+            # 3. Obtengo los documentos (ej. CV)
+            cur.execute("""
+                SELECT tipo, nombre_original, created_at
+                FROM documentos
+                WHERE aspirante_id = %s
+            """, (aspirante_id,))
+            
+            documentos = []
+            for fila in cur.fetchall():
+                doc = {"tipo": fila[0], "nombre_original": fila[1], "fecha": str(fila[2])}
+                documentos.append(doc)
+                
+            # Retorno todo agrupado en un solo objeto JSON estructurado
+            return jsonify({
+                "aspirante": aspirante,
+                "postulaciones": postulaciones,
+                "documentos": documentos
+            }), 200
+
+
+# ------------------------------------------------------------
+# PUT /api/aspirantes/<cedula>/estado
+# Permite al reclutador cambiar el estado del aspirante
+# y registrar un motivo/nota en el historial (Memoria Institucional).
+# ------------------------------------------------------------
+@app.route("/api/aspirantes/<cedula>/estado", methods=["PUT"])
+@requiere_token
+def cambiar_estado(cedula):
+    datos = request.get_json()
+    nuevo_estado = datos.get("nuevo_estado")
+    motivo = datos.get("motivo", "")
+    notas = datos.get("notas", "")
+    
+    # Valido que el estado sea uno de los permitidos
+    estados_validos = ['Postulado', 'En revisión', 'Citado', 'Seleccionado', 'Descartado']
+    if nuevo_estado not in estados_validos:
+        return jsonify({"error": "Estado inválido"}), 400
+        
+    if nuevo_estado == 'Descartado' and not motivo:
+         return jsonify({"error": "Debe proveer un motivo de rechazo"}), 400
+
+    # Obtengo el ID del usuario reclutador desde el token JWT
+    user_id = request.usuario.get("sub")
+    
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            # 1. Busco el ID del aspirante
+            cur.execute("SELECT id FROM aspirantes WHERE cedula = %s", (cedula,))
+            fila_asp = cur.fetchone()
+            if not fila_asp:
+                return jsonify({"error": "Aspirante no encontrado"}), 404
+            aspirante_id = fila_asp[0]
+            
+            # 2. Actualizo el estado en la tabla principal
+            cur.execute("""
+                UPDATE aspirantes 
+                SET estado_actual = %s 
+                WHERE id = %s
+            """, (nuevo_estado, aspirante_id))
+            
+            # 3. Busco el último cargo solicitado para registrarlo en el historial
+            cur.execute("""
+                SELECT empleo_solicitado 
+                FROM postulaciones 
+                WHERE aspirante_id = %s 
+                ORDER BY fecha_solicitud DESC LIMIT 1
+            """, (aspirante_id,))
+            fila_post = cur.fetchone()
+            cargo = fila_post[0] if fila_post else "N/A"
+            
+            # 4. Inserto el evento en la tabla historiales (Trazabilidad)
+            cur.execute("""
+                INSERT INTO historiales 
+                    (aspirante_id, fecha, cargo_solicitado, veredicto, motivo_rechazo, notas, user_id)
+                VALUES (%s, CURRENT_DATE, %s, %s, %s, %s, %s)
+            """, (aspirante_id, cargo, nuevo_estado, motivo, notas, user_id))
+            
+            conn.commit()
+            
+    return jsonify({"mensaje": f"Estado actualizado a {nuevo_estado}"}), 200
+
+
+# ------------------------------------------------------------
+# GET /api/aspirantes/<cedula>/historial
+# Retorna la línea de tiempo completa (Memoria Institucional)
+# de todos los cambios de estado y veredictos del candidato.
+# ------------------------------------------------------------
+@app.route("/api/aspirantes/<cedula>/historial", methods=["GET"])
+@requiere_token
+def obtener_historial(cedula):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            # Primero busco el ID del aspirante a partir de la cédula
+            cur.execute("SELECT id FROM aspirantes WHERE cedula = %s", (cedula,))
+            fila_asp = cur.fetchone()
+            if not fila_asp:
+                return jsonify({"error": "Aspirante no encontrado"}), 404
+            aspirante_id = fila_asp[0]
+            
+            # Hago un JOIN con la tabla usuarios para obtener el nombre del
+            # reclutador que hizo el cambio de estado.
+            cur.execute("""
+                SELECT h.fecha, h.cargo_solicitado, h.veredicto, 
+                       h.motivo_rechazo, h.notas, u.nombre as reclutador
+                FROM historiales h
+                LEFT JOIN usuarios u ON h.user_id = u.id
+                WHERE h.aspirante_id = %s
+                ORDER BY h.created_at DESC
+            """, (aspirante_id,))
+            
+            filas = cur.fetchall()
+            
+    columnas = ["fecha", "cargo_solicitado", "veredicto", "motivo_rechazo", "notas", "reclutador"]
+    
+    historial = []
+    for fila in filas:
+        item = dict(zip(columnas, fila))
+        item["fecha"] = str(item["fecha"]) # Convertir fecha a string
+        historial.append(item)
+        
+    return jsonify(historial), 200
 
 
 if __name__ == "__main__":

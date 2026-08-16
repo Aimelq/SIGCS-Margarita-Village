@@ -1,194 +1,211 @@
+// ============================================================
+// PÁGINA DEL PANEL PRINCIPAL (DashboardPage.jsx)
+// Sistema SICS - Hotel Margarita Village
+//
+// Presenta la vista de inicio del panel administrativo privado.
+// Muestra los 4 indicadores clave de desempeño (KPIs) en tiempo real,
+// una barra de búsqueda con autocompletado en directo y la tabla de
+// postulaciones más recientes.
+// ============================================================
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUserPlus, FiUsers, FiEye, FiCheckCircle, FiSearch } from 'react-icons/fi';
+import {
+  FiUserPlus, FiUsers, FiEye, FiCheckCircle,
+  FiSearch, FiArrowRight, FiLoader
+} from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
+  // Datos del usuario logueado e instancia del enrutador
+  const { usuario } = useAuth();
   const navigate = useNavigate();
-  
-  // ================= ESTADOS =================
+
+  // Estados para métricas (KPIs) y tabla de postulaciones recientes
   const [metricas, setMetricas] = useState(null);
   const [recientes, setRecientes] = useState([]);
   const [cargando, setCargando] = useState(true);
-  
-  // Estados para el buscador
+
+  // Estados para el buscador maestro con temporizador de espera (Debounce)
   const [busqueda, setBusqueda] = useState('');
   const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
   const [buscando, setBuscando] = useState(false);
 
-  // ================= EFECTOS =================
-  // useEffect para cargar los datos del dashboard apenas se renderiza el componente
+  // EFECTO 1: Carga simultánea de métricas y registros recientes al montar
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        // Promise.all permite hacer 2 peticiones a la API al mismo tiempo en paralelo
-        // Esto es mucho más rápido que hacer una y luego la otra
         const [resMetricas, resRecientes] = await Promise.all([
           api.get('/api/dashboard/metricas'),
           api.get('/api/dashboard/recientes')
         ]);
-        
         setMetricas(resMetricas.data);
         setRecientes(resRecientes.data);
       } catch (error) {
-        console.error("Error cargando el dashboard", error);
+        console.error('Error durante la lectura del dashboard:', error);
       } finally {
         setCargando(false);
       }
     };
-    
     cargarDatos();
   }, []);
 
-  // Efecto para el buscador en tiempo real (Debounce)
+  // EFECTO 2: Búsqueda dinámica con patrón Debounce de 300ms
   useEffect(() => {
-    // Si la búsqueda está vacía, borro los resultados
-    if (!busqueda.trim()) {
-      setResultadosBusqueda([]);
-      return;
-    }
-
-    // Debounce: espera 300 milisegundos después de que el usuario deja de escribir 
-    // antes de hacer la petición al backend. Esto evita sobrecargar el servidor
-    // haciendo una petición por cada letra que presiona.
-    const delayDebounce = setTimeout(async () => {
+    if (!busqueda.trim()) { setResultadosBusqueda([]); return; }
+    const delay = setTimeout(async () => {
       setBuscando(true);
       try {
         const res = await api.get(`/api/candidatos?q=${busqueda}`);
         setResultadosBusqueda(res.data);
-      } catch (error) {
-        console.error("Error buscando candidatos", error);
-      } finally {
-        setBuscando(false);
-      }
+      } catch (e) {
+        console.error('Error durante la búsqueda de candidatos:', e);
+      } finally { setBuscando(false); }
     }, 300);
-
-    // Si el usuario escribe antes de los 300ms, limpio el temporizador viejo
-    return () => clearTimeout(delayDebounce);
+    return () => clearTimeout(delay);
   }, [busqueda]);
 
-  // ================= FUNCIONES =================
-  
-  // Esta función asigna una clase CSS dependiendo del estado del aspirante
-  // para pintar el "badge" (la etiquetita de color) en la tabla
+  // Retorna la clase CSS correspondiente según el estado del candidato
   const getBadgeClass = (estado) => {
-    switch(estado) {
-      case 'Postulado': return 'badge-blue';
-      case 'En revisión': return 'badge-yellow';
-      case 'Citado': return 'badge-orange';
-      case 'Seleccionado': return 'badge-green';
-      case 'Descartado': return 'badge-red';
-      default: return 'badge-gray';
-    }
+    const mapa = {
+      'Postulado': 'badge-blue',
+      'En revisión': 'badge-yellow',
+      'Citado': 'badge-orange',
+      'Seleccionado': 'badge-green',
+      'Descartado': 'badge-red',
+    };
+    return mapa[estado] || 'badge-gray';
   };
 
-  // ================= RENDERIZADO =================
-  if (cargando) return <div className="cargando-dashboard">Cargando métricas...</div>;
+  // Formatea fechas ISO a formato legible en español venezolano
+  const formatDate = (str) => {
+    if (!str) return '—';
+    return new Date(str).toLocaleDateString('es-VE', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  if (cargando) {
+    return (
+      <div className="cargando-dashboard">
+        <FiLoader className="spin-anim" size={20} />
+        Cargando panel principal...
+      </div>
+    );
+  }
+
+  // Estructura de tarjetas de indicadores clave
+  const CARDS = [
+    {
+      icon: <FiUserPlus size={20} />,
+      bg: 'bg-blue-100',
+      label: 'Postulados esta semana',
+      value: metricas?.postulados_semana ?? 0
+    },
+    {
+      icon: <FiUsers size={20} />,
+      bg: 'bg-orange-100',
+      label: 'Total aspirantes',
+      value: metricas?.total_aspirantes ?? 0
+    },
+    {
+      icon: <FiEye size={20} />,
+      bg: 'bg-yellow-100',
+      label: 'En revisión',
+      value: metricas?.en_revision ?? 0
+    },
+    {
+      icon: <FiCheckCircle size={20} />,
+      bg: 'bg-green-100',
+      label: 'Seleccionados',
+      value: metricas?.aptos ?? 0
+    },
+  ];
 
   return (
     <div className="dashboard-page">
-      
-      {/* 1. BUSCADOR SUPERIOR */}
-      <div className="search-section">
-        <div className="search-box">
-          <FiSearch className="search-icon" />
-          <input 
-            type="text" 
-            placeholder="Buscar candidato por cédula, nombre o apellido..." 
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
+
+      {/* Cabecera del panel de control */}
+      <div className="dash-header-section">
+        <div className="dash-welcome">
+          <h1>Bienvenido/a, {usuario?.nombre?.split(' ')[0] || 'Reclutador'}</h1>
+          <p>Resumen de captación de talento — Sistema SICS</p>
         </div>
-        
-        {/* Dropdown de resultados. Solo se muestra si hay texto en el input */}
-        {busqueda && (
-          <div className="search-results">
-            {buscando ? (
-              <div className="search-item">Buscando...</div>
-            ) : resultadosBusqueda.length > 0 ? (
-              resultadosBusqueda.map((candidato, index) => (
-                <div 
-                  key={index} 
-                  className="search-item"
-                  // Al hacer clic, redirijo al perfil completo de ese candidato
-                  onClick={() => navigate(`/dashboard/expediente/${candidato.cedula}`)}
-                >
-                  <div className="candidato-info">
-                    <strong>{candidato.nombre} {candidato.apellido}</strong>
-                    <span>CI: {candidato.cedula}</span>
+
+        {/* Buscador maestro con autocompletado desplegable */}
+        <div className="search-section">
+          <div className="search-box">
+            <FiSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Buscar por cédula o nombre..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+          </div>
+          {busqueda && (
+            <div className="search-results">
+              {buscando ? (
+                <div className="search-item text-muted">Buscando en la base de datos...</div>
+              ) : resultadosBusqueda.length > 0 ? (
+                resultadosBusqueda.map((c, i) => (
+                  <div
+                    key={i}
+                    className="search-item"
+                    onClick={() => navigate(`/dashboard/expediente/${c.cedula}`)}
+                  >
+                    <div className="candidato-avatar-small">
+                      {c.nombre?.charAt(0)}{c.apellido?.charAt(0)}
+                    </div>
+                    <div className="candidato-info">
+                      <strong>{c.nombre} {c.apellido}</strong>
+                      <span>C.I. {c.cedula}</span>
+                    </div>
+                    <span className={`badge ${getBadgeClass(c.estado_actual)}`}>
+                      {c.estado_actual}
+                    </span>
                   </div>
-                  <span className={`badge ${getBadgeClass(candidato.estado_actual)}`}>
-                    {candidato.estado_actual}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="search-item">No se encontraron resultados</div>
-            )}
-          </div>
-        )}
+                ))
+              ) : (
+                <div className="search-item text-muted">No se encontraron candidatos</div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 2. CARDS DE MÉTRICAS */}
+      {/* Tarjetas de indicadores clave (KPIs) */}
       <div className="metrics-grid">
-        <div className="metric-card">
-          <div className="metric-icon bg-blue-100">
-            <FiUserPlus className="text-blue-600" />
+        {CARDS.map((card, i) => (
+          <div className="metric-card" key={i}>
+            <div className={`metric-icon ${card.bg}`}>{card.icon}</div>
+            <div className="metric-info">
+              <h3>{card.label}</h3>
+              <p className="metric-value">{card.value}</p>
+            </div>
           </div>
-          <div className="metric-info">
-            <h3>Postulados Semana</h3>
-            <p className="metric-value">{metricas?.postulados_semana || 0}</p>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-icon bg-orange-100">
-            <FiUsers className="text-orange-600" />
-          </div>
-          <div className="metric-info">
-            <h3>Total Aspirantes</h3>
-            <p className="metric-value">{metricas?.total_aspirantes || 0}</p>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-icon bg-yellow-100">
-            <FiEye className="text-yellow-600" />
-          </div>
-          <div className="metric-info">
-            <h3>En Revisión</h3>
-            <p className="metric-value">{metricas?.en_revision || 0}</p>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-icon bg-green-100">
-            <FiCheckCircle className="text-green-600" />
-          </div>
-          <div className="metric-info">
-            <h3>Seleccionados (Aptos)</h3>
-            <p className="metric-value">{metricas?.aptos || 0}</p>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* 3. TABLA DE REGISTROS RECIENTES */}
+      {/* Tabla de postulaciones recientes */}
       <div className="recent-section">
         <div className="section-header">
-          <h2>Postulaciones Recientes</h2>
-          <button className="btn-secondary" onClick={() => navigate('/dashboard/candidatos')}>
-            Ver todos
+          <h2>Postulaciones recientes</h2>
+          <button
+            className="btn-secondary"
+            onClick={() => navigate('/dashboard/candidatos')}
+          >
+            Ver catálogo completo <FiArrowRight size={14} />
           </button>
         </div>
-        
-        <div className="table-container">
+
+        <div className="table-container" style={{ border: 'none', borderRadius: 0 }}>
           <table className="data-table">
             <thead>
               <tr>
                 <th>Cédula</th>
                 <th>Aspirante</th>
-                <th>Cargo Solicitado</th>
+                <th>Cargo solicitado</th>
                 <th>Estado</th>
                 <th>Fecha</th>
                 <th>Acción</th>
@@ -197,28 +214,39 @@ const DashboardPage = () => {
             <tbody>
               {recientes.map((fila, i) => (
                 <tr key={i}>
-                  <td>{fila.cedula}</td>
-                  <td><strong>{fila.nombre} {fila.apellido}</strong></td>
-                  <td>{fila.empleo_solicitado || 'No especificado'}</td>
+                  <td style={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: 'var(--texto-mut)' }}>
+                    {fila.cedula}
+                  </td>
+                  <td>
+                    <div className="td-candidato">
+                      <div className="candidato-avatar-small">
+                        {fila.nombre?.charAt(0)}{fila.apellido?.charAt(0)}
+                      </div>
+                      <span style={{ fontWeight: 600 }}>{fila.nombre} {fila.apellido}</span>
+                    </div>
+                  </td>
+                  <td className="text-muted">{fila.empleo_solicitado || '—'}</td>
                   <td>
                     <span className={`badge ${getBadgeClass(fila.estado_actual)}`}>
                       {fila.estado_actual}
                     </span>
                   </td>
-                  <td>{fila.created_at}</td>
+                  <td className="text-muted">{formatDate(fila.created_at)}</td>
                   <td>
-                    <button 
+                    <button
                       className="btn-action"
                       onClick={() => navigate(`/dashboard/expediente/${fila.cedula}`)}
                     >
-                      Ver perfil
+                      Ver expediente <FiArrowRight size={12} />
                     </button>
                   </td>
                 </tr>
               ))}
               {recientes.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center">No hay registros recientes</td>
+                  <td colSpan={6} className="text-center text-muted" style={{ padding: '2.5rem' }}>
+                    No existen postulaciones recientes registradas.
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -230,3 +258,4 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+

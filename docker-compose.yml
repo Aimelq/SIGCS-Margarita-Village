@@ -1,20 +1,36 @@
+# ============================================================
+# DOCKER COMPOSE - Sistema SICS (Hotel Margarita Village)
+# 
+# Define y ejecuta la arquitectura de microservicios en contenedores:
+#   1. db:       Servidor de Base de Datos PostgreSQL 16
+#   2. backend:  Servidor Web Python / Flask API
+#   3. frontend: Servidor de Desarrollo React / Vite SPA
+#   4. adminer:  Administrador gráfico web para PostgreSQL
+# ============================================================
+
 services:
+  # ----------------------------------------------------------
+  # SERVICIO 1: Base de Datos PostgreSQL
+  # ----------------------------------------------------------
   db:
     image: postgres:16
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: SIGCS-MV
+      POSTGRES_DB: SICS-MV
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U admin -d SIGCS-MV']
+      test: ['CMD-SHELL', 'pg_isready -U admin -d SICS-MV']
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ----------------------------------------------------------
+  # SERVICIO 2: Backend API (Python / Flask)
+  # ----------------------------------------------------------
   backend:
     build:
       context: ./backend
@@ -23,11 +39,14 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql://admin:admin123@db:5432/SIGCS-MV
+      - DATABASE_URL=postgresql://admin:admin123@db:5432/SICS-MV
     depends_on:
       db:
         condition: service_healthy
 
+  # ----------------------------------------------------------
+  # SERVICIO 3: Frontend Web (React 19 + Vite)
+  # ----------------------------------------------------------
   frontend:
     build:
       context: ./frontend
@@ -40,6 +59,9 @@ services:
     depends_on:
       - backend
 
+  # ----------------------------------------------------------
+  # SERVICIO 4: Adminer (Gestor visual de Base de Datos)
+  # ----------------------------------------------------------
   adminer:
     image: adminer
     ports:
@@ -50,3 +72,4 @@ services:
 
 volumes:
   db_data:
+

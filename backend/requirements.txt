@@ -1,6 +1,25 @@
+# Dependencias del backend de SICS - Hotel Margarita Village
+# Sistema de Información para la Captación y Selección de Talento Humano
+# Instalar localmente con: pip install -r requirements.txt
+
+# Framework web principal
 Flask>=2.3.0
+
+# Permite que React (puerto 5173) hable con Flask (puerto 5000)
 Flask-Cors>=3.0.10
-psycopg[binary]>=3.1
+
+# Conector de Python con PostgreSQL
+psycopg2-binary>=2.9.0
+
+# Para lectura de variables de entorno desde archivos .env
 python-dotenv>=1.0.0
+
+# Para generación y verificación de tokens JWT de seguridad
 PyJWT>=2.8.0
+
+# Para encriptar y verificar contraseñas de forma segura
 bcrypt>=4.1.0
+
+# Para manejo seguro de archivos subidos (secure_filename)
+Werkzeug>=2.3.0
+

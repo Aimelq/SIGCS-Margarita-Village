@@ -1,45 +1,60 @@
-// Instancia de Axios configurada con la URL base del backend.
-// La importo desde aqui en todos los componentes para no repetir
-// la URL completa en cada llamada a la API.
+// ============================================================
+// CONFIGURACIÓN DEL CLIENTE HTTP (AXIOS)
+// Sistema SICS - Hotel Margarita Village
+//
+// Este archivo crea y exporta una instancia personalizada de Axios.
+// Configura la URL base del servidor backend y define interceptores
+// automáticos para el envío de tokens de seguridad y la gestión
+// centralizada de errores de autenticación.
+// ============================================================
+
 import axios from 'axios'
 
+// Creación de la instancia global de Axios
 const api = axios.create({
   baseURL: 'http://localhost:5000',
   headers: { 'Content-Type': 'application/json' }
 })
 
-// Interceptor de Peticiones (Request)
-// Antes de que cualquier petición salga de React hacia el backend, 
-// este código se ejecuta automáticamente.
+// ------------------------------------------------------------
+// INTERCEPTOR DE PETICIONES (Request Interceptor)
+// Se ejecuta de manera transparente antes de que cualquier
+// solicitud salga desde React hacia el backend Python.
+// ------------------------------------------------------------
 api.interceptors.request.use(
   (config) => {
-    // Busco si hay un token guardado en el navegador (localStorage)
-    const token = localStorage.getItem('sigcs_token');
+    // Recupera el token guardado en la memoria local del navegador (localStorage)
+    const token = localStorage.getItem('sics_token') || localStorage.getItem('sigcs_token');
     if (token) {
-      // Si existe, lo agrego a los headers de la petición
-      // con el formato estándar "Bearer <token>"
+      // Inyecta el token en la cabecera estándar de autorización en formato Bearer
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    // Retorna cualquier error de configuración antes del envío
     return Promise.reject(error);
   }
 );
 
-// Interceptor de Respuestas (Response)
-// Cuando el backend responde, este código se ejecuta.
+// ------------------------------------------------------------
+// INTERCEPTOR DE RESPUESTAS (Response Interceptor)
+// Se ejecuta automáticamente al recibir la respuesta del backend.
+// ------------------------------------------------------------
 api.interceptors.response.use(
-  (response) => response, // Si todo sale bien (status 200), devuelvo la respuesta tal cual
+  (response) => response, // Si el código HTTP es 2xx, retorna la respuesta directamente
   (error) => {
-    // Si el backend responde con un error 401 (No Autorizado)
-    // significa que el token expiró o es inválido.
+    // Si la API responde con estado 401 (No Autorizado / Token Expirado)
     if (error.response && error.response.status === 401) {
-      console.warn("Sesión expirada o token inválido. Cerrando sesión...");
-      // Borro el token y el usuario del navegador
+      console.warn("Sesión expirada o token inválido. Redirigiendo al inicio de sesión...");
+      
+      // Limpia los datos de sesión almacenados en el navegador
+      localStorage.removeItem('sics_token');
+      localStorage.removeItem('sics_usuario');
       localStorage.removeItem('sigcs_token');
       localStorage.removeItem('sigcs_usuario');
-      // Redirijo al usuario a la página de login
+      
+      // Redirige automáticamente a la pantalla de login del panel privado
       window.location.href = '/login'; 
     }
     return Promise.reject(error);
@@ -47,3 +62,4 @@ api.interceptors.response.use(
 );
 
 export default api
+

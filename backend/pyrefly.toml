@@ -1,0 +1,16 @@
+# pyrefly.toml
+# Configuración del analizador estático Pyrefly para el backend SICS.
+#
+# Las dependencias del proyecto (Flask, psycopg2, etc.) se ejecutan dentro
+# del contenedor Docker y no están disponibles en el entorno Python local.
+# Esta configuración suprime los falsos positivos del análisis estático.
+
+[python]
+# Apunta al intérprete del entorno virtual del proyecto
+python_interpreter = ".venv/Scripts/python.exe"
+
+[errors]
+# Suprime errores de módulos no encontrados (Flask, psycopg2, etc.)
+# ya que estas dependencias residen en el contenedor Docker, no en el host.
+missing_module_source = false
+import_cycle = false

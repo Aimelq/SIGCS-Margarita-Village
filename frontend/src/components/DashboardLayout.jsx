@@ -1,114 +1,176 @@
+// ============================================================
+// DISPOSICIÓN PRINCIPAL DEL PANEL (DashboardLayout)
+// Sistema SICS - Hotel Margarita Village
+//
+// Suministra la estructura base del panel administrativo privado.
+// Contiene la barra lateral de navegación (Sidebar), la cabecera superior
+// (Header con breadcrumbs y perfil del reclutador) y la zona central
+// receptora de vistas mediante el componente <Outlet /> de React Router.
+// ============================================================
+
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiGrid, FiUsers, FiClipboard, FiBarChart2, FiLogOut, FiMenu, FiX, FiUser } from 'react-icons/fi';
+import {
+  FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiUser, FiChevronRight, FiClipboard
+} from 'react-icons/fi';
 import './DashboardLayout.css';
 
+// Mapeo de rutas dinámicas hacia etiquetas amigables para la miga de pan (Breadcrumb)
+const ROUTE_TITLES = {
+  '/dashboard': 'Panel principal',
+  '/dashboard/candidatos': 'Candidatos',
+  '/dashboard/examenes': 'Banco de preguntas',
+  '/dashboard/evaluaciones': 'Evaluaciones',
+  '/dashboard/reportes': 'Reportes & KPIs',
+};
+
 const DashboardLayout = () => {
+  // Extrae información del usuario autenticado y la función de cierre de sesión desde AuthContext
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
-  // Estado para controlar si el menú lateral (sidebar) está abierto o cerrado en móviles
+  const location = useLocation();
+
+  // Estado para controlar la visibilidad del menú lateral en dispositivos móviles
   const [menuAbierto, setMenuAbierto] = useState(false);
 
-  // Función para cerrar sesión y redirigir
+  // Manejador del evento de cierre de sesión
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  // Función para cerrar el menú en móviles cuando se hace clic en un enlace
+  // Cierra automáticamente la barra lateral al hacer clic en un enlace en pantallas pequeñas
   const cerrarMenu = () => {
-    if (window.innerWidth <= 768) {
-      setMenuAbierto(false);
+    if (window.innerWidth <= 992) setMenuAbierto(false);
+  };
+
+  // Detección dinámica de ruta de Expediente para generar el breadcrumb detallado
+  const isExpediente = location.pathname.startsWith('/dashboard/expediente/');
+  const cedula = isExpediente ? location.pathname.split('/').pop() : null;
+
+  // Genera el componente visual de la miga de pan según la ruta actual
+  const getBreadcrumb = () => {
+    if (isExpediente) {
+      return (
+        <span className="header-breadcrumb">
+          Candidatos
+          <FiChevronRight size={12} style={{ margin: '0 4px', opacity: 0.5 }} />
+          Expediente · {cedula}
+        </span>
+      );
     }
+    const title = ROUTE_TITLES[location.pathname] || '';
+    return title ? <span className="header-breadcrumb">{title}</span> : null;
   };
 
   return (
     <div className="dashboard-layout">
-      {/* Botón flotante para abrir el menú en móviles */}
-      <button 
-        className="mobile-menu-btn" 
+
+      {/* Botón flotante para alternar menú en pantallas móviles */}
+      <button
+        className="mobile-menu-btn"
         onClick={() => setMenuAbierto(!menuAbierto)}
         aria-label="Abrir menú"
       >
-        {menuAbierto ? <FiX size={24} /> : <FiMenu size={24} />}
+        {menuAbierto ? <FiX size={20} /> : <FiMenu size={20} />}
       </button>
 
-      {/* 
-        SIDEBAR (Barra lateral izquierda)
-        Si menuAbierto es true, se le agrega la clase 'abierto'
-      */}
+      {/* Barra lateral de navegación principal (Sidebar) */}
       <aside className={`sidebar ${menuAbierto ? 'abierto' : ''}`}>
+
+        {/* Encabezado del menú lateral con isotipo y acrónimo del sistema */}
         <div className="sidebar-header">
-          <img src="/Margarita-Village-logo.png" alt="Logo" className="sidebar-logo" />
-          <h3>Portal RRHH</h3>
+          <img src="/Margarita-Village-logo.png" alt="Logo Hotel Margarita Village" className="sidebar-logo" />
+          <div>
+            <h3>SICS</h3>
+            <span className="sidebar-sub">Margarita Village</span>
+          </div>
         </div>
 
+        {/* Enlaces de navegación interna */}
         <nav className="sidebar-nav">
-          {/* 
-            NavLink es como la etiqueta <a> pero especial de React Router.
-            Automáticamente le pone la clase "active" si estamos en esa ruta.
-          */}
-          <NavLink to="/dashboard" end onClick={cerrarMenu} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <FiGrid className="nav-icon" />
-            <span>Panel Principal</span>
+          <span className="sidebar-section-label">Navegación</span>
+
+          {/* Enlace al Dashboard Principal */}
+          <NavLink
+            to="/dashboard"
+            end
+            onClick={cerrarMenu}
+            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+          >
+            <FiGrid className="nav-icon" size={16} />
+            <span>Panel principal</span>
           </NavLink>
-          
-          <NavLink to="/dashboard/candidatos" onClick={cerrarMenu} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <FiUsers className="nav-icon" />
+
+          {/* Enlace a la Lista Maestra de Candidatos */}
+          <NavLink
+            to="/dashboard/candidatos"
+            onClick={cerrarMenu}
+            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+          >
+            <FiUsers className="nav-icon" size={16} />
             <span>Candidatos</span>
           </NavLink>
 
-          <NavLink to="/dashboard/evaluaciones" onClick={cerrarMenu} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <FiClipboard className="nav-icon" />
-            <span>Evaluaciones</span>
-          </NavLink>
-
-          <NavLink to="/dashboard/reportes" onClick={cerrarMenu} className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <FiBarChart2 className="nav-icon" />
-            <span>Reportes</span>
+          {/* Enlace al Banco de Preguntas Técnicas (Sprint 7) */}
+          <NavLink
+            to="/dashboard/examenes"
+            onClick={cerrarMenu}
+            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+          >
+            <FiClipboard className="nav-icon" size={16} />
+            <span>Banco de preguntas</span>
           </NavLink>
         </nav>
 
+        {/* Pie de la barra lateral con ficha del reclutador y botón de cierre de sesión */}
         <div className="sidebar-footer">
+          <div className="sidebar-user-info">
+            <div className="sidebar-avatar">
+              <FiUser size={14} />
+            </div>
+            <div className="sidebar-user-meta">
+              <span className="sidebar-user-name">{usuario?.nombre || 'Usuario'}</span>
+              <span className="sidebar-user-role">{usuario?.rol || 'reclutador'}</span>
+            </div>
+          </div>
           <button onClick={handleLogout} className="btn-logout">
-            <FiLogOut className="nav-icon" />
-            <span>Cerrar Sesión</span>
+            <FiLogOut size={15} />
+            <span>Cerrar sesión</span>
           </button>
         </div>
       </aside>
 
-      {/* 
-        CONTENIDO PRINCIPAL (Lado derecho)
-      */}
+      {/* Área principal del panel de administración */}
       <main className="dashboard-main">
-        {/* Cabecera superior del panel */}
+        {/* Cabecera superior con breadcrumb dinámico e identificador de usuario */}
         <header className="dashboard-header">
           <div className="header-title">
-            {/* Aquí podríamos poner una miga de pan o el título de la página actual */}
+            {getBreadcrumb()}
           </div>
           <div className="header-user">
-            <span className="user-name">{usuario?.nombre || 'Reclutador'}</span>
+            <div className="user-meta">
+              <span className="user-name">{usuario?.nombre?.split(' ')[0] || 'Usuario'}</span>
+              <span className="user-role">{usuario?.rol || 'reclutador'}</span>
+            </div>
             <div className="user-avatar">
-              <FiUser size={20} />
+              <FiUser size={16} />
             </div>
           </div>
         </header>
 
-        {/* 
-          Área donde se inyectan las páginas hijas.
-          Si la ruta es /dashboard, Outlet renderiza DashboardPage.
-          Si la ruta es /dashboard/expediente/123, Outlet renderiza ExpedientePage.
-        */}
+        {/* Zona receptora donde se renderizan las páginas hijas (DashboardPage, CandidatosPage, ExpedientePage) */}
         <div className="dashboard-content">
           <Outlet />
         </div>
       </main>
 
-      {/* Fondo oscuro cuando el menú está abierto en móviles */}
-      {menuAbierto && <div className="sidebar-overlay" onClick={cerrarMenu}></div>}
+      {/* Capa de sombra para cerrar el menú en móviles al hacer clic fuera */}
+      {menuAbierto && <div className="sidebar-overlay" onClick={cerrarMenu} />}
     </div>
   );
 };
 
 export default DashboardLayout;
+

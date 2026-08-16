@@ -1,18 +1,65 @@
+// ============================================================
+// COMPONENTE DEL FORMULARIO DE POSTULACIÓN (FormularioPostulacion)
+// Sistema SICS - Hotel Margarita Village
+//
+// Formulario guiado por pasos (Wizard/Stepper de 4 fases) para el
+// registro o actualización de datos del aspirante:
+//   Paso 1: Datos Personales, Ubicación y Contacto.
+//   Paso 2: Formación Académica y Expectativa Laboral.
+//   Paso 3: Perfil Profesional, Experiencia y Destrezas.
+//   Paso 4: Adjunto de Currículum Vitae (PDF) y Cierre.
+// ============================================================
+
 import { useState, useRef } from 'react'
 import api from '../api/axios'
 import { FiCheck, FiFileText, FiUploadCloud } from 'react-icons/fi'
 import './FormularioPostulacion.css'
 
+// -------------------------------------------------------
+// CONSTANTES DE OPCIONES PARA SELECTORES
+// -------------------------------------------------------
+const ESTADOS_VENEZUELA = [
+  'Amazonas', 'Anzoátegui', 'Apure', 'Aragua', 'Barinas', 'Bolívar',
+  'Carabobo', 'Cojedes', 'Delta Amacuro', 'Distrito Capital', 'Falcón',
+  'Guárico', 'La Guaira (Vargas)', 'Lara', 'Mérida', 'Miranda', 'Monagas',
+  'Nueva Esparta', 'Portuguesa', 'Sucre', 'Táchira', 'Trujillo',
+  'Yaracuy', 'Zulia', 'Extranjero'
+]
+
+const CARGOS_RESORT = [
+  'Recepción / Front Desk',
+  'Atención al Huésped / Guest Service',
+  'Animación / Recreación / Entretenimiento',
+  'Sistemas / Tecnología (IT)',
+  'Ventas / Reservas / Comercial',
+  'Ama de Llaves / Camarería / Lavandería',
+  'Alimentos y Bebidas (Cocina / Chef)',
+  'Alimentos y Bebidas (Mesero / Barman)',
+  'Mantenimiento / Servicios Generales',
+  'Seguridad y Prevención',
+  'Recursos Humanos / Selección',
+  'Administración / Contabilidad',
+  'Otro'
+]
+
 function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExito }) {
+  // Estado para controlar el número de paso activo en el wizard (1 a 4)
   const [pasoActual, setPasoActual] = useState(1)
+
+  // Estado de carga mientras se envían las peticiones HTTP al servidor
   const [cargando, setCargando] = useState(false)
+
+  // Estado para desplegar mensajes de error en validaciones locales o remotas
   const [errorGlobal, setErrorGlobal] = useState('')
+
+  // Referencia física para activar el selector oculto de archivos PDF
   const fileInputRef = useRef(null)
 
+  // Estado unificado con los campos del formulario pre-poblados si el candidato ya existe
   const [form, setForm] = useState({
     nombre: datosIniciales?.nombre || '',
     apellido: datosIniciales?.apellido || '',
-    correo: datosIniciales?.correo || '',
+    correo: datosIniciales?.correo || datosIniciales?.email || '',
     telefono: datosIniciales?.telefono || '',
     edad: datosIniciales?.edad || '',
     sexo: datosIniciales?.sexo || '',
@@ -20,25 +67,29 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
     direccion: datosIniciales?.direccion || '',
     formacion: datosIniciales?.formacion || '',
     
-    // Campos especificos de postulacion
-    municipio: '',
-    empleo_solicitado: '',
-    sueldo_aspira: '',
-    monto_superior_aspira: '',
-    trabaja_actualmente: '',
-    experiencia_ultimos_empleos: '',
-    habilidades: '',
-    fortalezas: '',
-    referencias: '',
-    motivacion: '',
-    disponibilidad_rotativa: '',
-    disponibilidad_fines: '',
-    carga_familiar: '',
-    data_bancaria: ''
+    // Campos específicos del perfil de postulación
+    municipio: datosIniciales?.municipio || datosIniciales?.municipio_postulacion || '',
+    estado_civil: datosIniciales?.estado_civil || '',
+    empleo_solicitado: datosIniciales?.empleo_solicitado || '',
+    sueldo_aspira: datosIniciales?.sueldo_aspira || '',
+    trabaja_actualmente: datosIniciales?.trabaja_actualmente || '',
+    experiencia_ultimos_empleos: datosIniciales?.experiencia_ultimos_empleos || '',
+    habilidades: datosIniciales?.habilidades || '',
+    fortalezas: datosIniciales?.fortalezas || '',
+    referencias: datosIniciales?.referencias || '',
+    motivacion: datosIniciales?.motivacion || '',
+    disponibilidad_rotativa: datosIniciales?.disponibilidad_rotativa ? 'Sí' : (datosIniciales?.disponibilidad_rotativa === false ? 'No' : ''),
+    disponibilidad_fines: datosIniciales?.disponibilidad_fines ? 'Sí' : (datosIniciales?.disponibilidad_fines === false ? 'No' : ''),
+    carga_familiar: datosIniciales?.carga_familiar || '',
+    data_bancaria: datosIniciales?.data_bancaria || '',
+    medio_transporte: datosIniciales?.medio_transporte || '',
+    tipo_vehiculo: datosIniciales?.tipo_vehiculo || ''
   })
 
+  // Archivo PDF del currículum vitae seleccionado por el usuario
   const [cvFile, setCvFile] = useState(null)
 
+  // Control único para la actualización de cualquier campo de texto o selección
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setForm(prev => ({
@@ -47,43 +98,54 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
     }))
   }
 
+  // Validación y avance hacia el Paso 2
   const irAlPaso2 = () => {
-    if (!form.nombre || !form.apellido || !form.correo || !form.telefono || !form.edad || !form.sexo || !form.municipio) {
-      setErrorGlobal('Por favor completa los campos obligatorios del Paso 1.')
+    if (!form.nombre || !form.apellido || !form.correo || !form.telefono || !form.edad || !form.sexo || !form.lugar_nacimiento || !form.municipio) {
+      setErrorGlobal('Por favor complete los campos obligatorios del Paso 1.')
       return
     }
+
+    const edadNum = parseInt(form.edad, 10)
+    if (isNaN(edadNum) || edadNum < 18) {
+      setErrorGlobal('La edad debe ser un número entero mayor o igual a 18 años.')
+      return
+    }
+
     setErrorGlobal('')
     setPasoActual(2)
   }
 
+  // Validación y avance hacia el Paso 3
   const irAlPaso3 = () => {
     if (!form.formacion || !form.empleo_solicitado || !form.sueldo_aspira || !form.trabaja_actualmente) {
-      setErrorGlobal('Por favor completa los campos obligatorios del Paso 2.')
+      setErrorGlobal('Por favor complete los campos obligatorios del Paso 2.')
       return
     }
     setErrorGlobal('')
     setPasoActual(3)
   }
 
+  // Validación y avance hacia el Paso 4
   const irAlPaso4 = () => {
     if (!form.experiencia_ultimos_empleos || !form.habilidades || !form.fortalezas || !form.motivacion) {
-      setErrorGlobal('Por favor completa los campos obligatorios del Paso 3.')
+      setErrorGlobal('Por favor complete los campos obligatorios del Paso 3.')
       return
     }
     setErrorGlobal('')
     setPasoActual(4)
   }
 
+  // Validación del archivo PDF seleccionado en el Paso 4
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (!file) return
 
     if (file.type !== 'application/pdf') {
-      setErrorGlobal('El currículum debe estar en formato PDF.')
+      setErrorGlobal('El documento de currículum debe estar en formato PDF.')
       return
     }
     if (file.size > 5 * 1024 * 1024) {
-      setErrorGlobal('El archivo es demasiado pesado (Máx: 5MB).')
+      setErrorGlobal('El archivo excede el tamaño máximo permitido (5MB).')
       return
     }
 
@@ -91,13 +153,14 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
     setCvFile(file)
   }
 
+  // Envío final del formulario y carga del documento multipart al backend
   const enviarFormulario = async () => {
     if (!form.disponibilidad_rotativa || !form.disponibilidad_fines || !form.carga_familiar || !form.data_bancaria) {
-       setErrorGlobal('Por favor completa los campos obligatorios del Paso 4.')
+       setErrorGlobal('Por favor complete los campos obligatorios del Paso 4.')
        return
     }
     if (!cvFile && !esActualizacion) {
-      setErrorGlobal('El Currículum Vitae es obligatorio para nuevos ingresos.')
+      setErrorGlobal('El Currículum Vitae es obligatorio para nuevos registros.')
       return
     }
 
@@ -107,12 +170,14 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
     try {
       const datosCompletos = { ...form, cedula }
       
+      // Llamada REST para crear o actualizar el registro del aspirante
       if (esActualizacion) {
         await api.put(`/api/aspirantes/${cedula}`, datosCompletos)
       } else {
         await api.post('/api/aspirantes', datosCompletos)
       }
 
+      // Si se adjunto un nuevo archivo PDF, se envía via multipart/form-data
       if (cvFile) {
         const formData = new FormData()
         formData.append('archivo', cvFile)
@@ -124,11 +189,12 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
       onExito(form.nombre)
     } catch (err) {
       console.error(err)
-      setErrorGlobal(err.response?.data?.error || 'Ocurrió un error guardando tus datos.')
+      setErrorGlobal(err.response?.data?.error || 'Ocurrió un error al guardar la información.')
     } finally {
       setCargando(false)
     }
   }
+
 
   return (
     <div className="form-container fade-in-up">
@@ -173,15 +239,17 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
               <input name="apellido" className="input-field" value={form.apellido} onChange={handleChange} disabled={esActualizacion} placeholder="Ej: Gonzalez" />
             </div>
             <div className="form-group">
-              <label className="form-label">Edad *</label>
-              <select name="edad" className="input-field" value={form.edad} onChange={handleChange}>
-                <option value="">Elige...</option>
-                <option value="18 - 25 años">18 - 25 años</option>
-                <option value="26 - 35 años">26 - 35 años</option>
-                <option value="36 - 45 años">36 - 45 años</option>
-                <option value="46 - 55 años">46 - 55 años</option>
-                <option value="Más de 55 años">Más de 55 años</option>
-              </select>
+              <label className="form-label">Edad (mínimo 18 años) *</label>
+              <input
+                type="number"
+                name="edad"
+                min="18"
+                max="99"
+                className="input-field"
+                value={form.edad}
+                onChange={handleChange}
+                placeholder="Ej: 25"
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Sexo *</label>
@@ -192,12 +260,12 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Lugar de Nacimiento *</label>
+              <label className="form-label">Estado de Nacimiento *</label>
               <select name="lugar_nacimiento" className="input-field" value={form.lugar_nacimiento} onChange={handleChange}>
                 <option value="">Elige...</option>
-                <option value="Nueva Esparta">Nueva Esparta</option>
-                <option value="Otro Estado (Venezuela)">Otro Estado (Venezuela)</option>
-                <option value="Extranjero">Extranjero</option>
+                {ESTADOS_VENEZUELA.map((st, i) => (
+                  <option key={i} value={st}>{st}</option>
+                ))}
               </select>
             </div>
             <div className="form-group">
@@ -215,6 +283,17 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
                 <option value="Península de Macanao">Península de Macanao</option>
                 <option value="Tubores">Tubores</option>
                 <option value="Villalba">Villalba</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Estado Civil</label>
+              <select name="estado_civil" className="input-field" value={form.estado_civil} onChange={handleChange}>
+                <option value="">Elige...</option>
+                <option value="Soltero(a)">Soltero(a)</option>
+                <option value="Casado(a)">Casado(a)</option>
+                <option value="Divorciado(a)">Divorciado(a)</option>
+                <option value="Viudo(a)">Viudo(a)</option>
+                <option value="Conviviente">Conviviente</option>
               </select>
             </div>
             <div className="form-group full-width">
@@ -267,31 +346,24 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
               <label className="form-label">Empleo Solicitado *</label>
               <select name="empleo_solicitado" className="input-field" value={form.empleo_solicitado} onChange={handleChange}>
                 <option value="">Elige...</option>
-                <option value="Recepción">Recepción</option>
-                <option value="Atención al Huésped">Atención al Huésped</option>
-                <option value="Camarera / Ama de Llaves">Camarera / Ama de Llaves</option>
-                <option value="Mantenimiento">Mantenimiento</option>
-                <option value="Alimentos y Bebidas (Cocina)">Alimentos y Bebidas (Cocina)</option>
-                <option value="Alimentos y Bebidas (Mesero/Barman)">Alimentos y Bebidas (Mesero/Barman)</option>
-                <option value="Seguridad">Seguridad</option>
-                <option value="Administración / RRHH">Administración / RRHH</option>
-                <option value="Otro">Otro</option>
+                {CARGOS_RESORT.map((c, i) => (
+                  <option key={i} value={c}>{c}</option>
+                ))}
               </select>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Sueldo que aspira *</label>
-              <select name="sueldo_aspira" className="input-field" value={form.sueldo_aspira} onChange={handleChange}>
-                <option value="">Elige...</option>
-                <option value="$150 - $200">$150 - $200</option>
-                <option value="$200 - $300">$200 - $300</option>
-                <option value="$300 - $400">$300 - $400</option>
-                <option value="Superior a $400">Superior a $400</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Especifique Monto Superior (Opcional)</label>
-              <input name="monto_superior_aspira" className="input-field" value={form.monto_superior_aspira} onChange={handleChange} placeholder="Tu respuesta" />
+            <div className="form-group full-width">
+              <label className="form-label">Sueldo al que aspira (Monto exacto en USD $) *</label>
+              <input
+                type="number"
+                name="sueldo_aspira"
+                min="0"
+                step="10"
+                className="input-field"
+                value={form.sueldo_aspira}
+                onChange={handleChange}
+                placeholder="Ej: 350"
+              />
             </div>
           </div>
 
@@ -364,6 +436,26 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
                 <option value="No">No</option>
               </select>
             </div>
+            <div className="form-group">
+              <label className="form-label">Medio de Transporte</label>
+              <select name="medio_transporte" className="input-field" value={form.medio_transporte} onChange={handleChange}>
+                <option value="">Elige...</option>
+                <option value="Público">Público</option>
+                <option value="Vehículo propio">Vehículo propio</option>
+                <option value="Caminando / Otro">Caminando / Otro</option>
+              </select>
+            </div>
+
+            {form.medio_transporte === 'Vehículo propio' && (
+              <div className="form-group">
+                <label className="form-label">Tipo de Vehículo</label>
+                <select name="tipo_vehiculo" className="input-field" value={form.tipo_vehiculo} onChange={handleChange}>
+                  <option value="">Elige...</option>
+                  <option value="Carro">Carro</option>
+                  <option value="Moto">Moto</option>
+                </select>
+              </div>
+            )}
 
             <div className="form-group full-width">
               <label className="form-label">Detalle su carga familiar *</label>

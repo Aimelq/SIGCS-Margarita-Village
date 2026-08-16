@@ -1,14 +1,21 @@
+// ============================================================
+// PÁGINA INSTITUCIONAL DE BIENVENIDA (LandingPage.jsx)
+// Sistema SICS - Hotel Margarita Village
+//
+// Es la vista principal pública del portal. Presenta la propuesta de valor
+// del hotel, los beneficios de laborar en la institución y proporciona
+// los botones de llamada a la acción (CTA) para iniciar el proceso de postulación.
+// ============================================================
+
 import { useNavigate } from 'react-router-dom'
 import { FaRegBuilding, FaChartLine, FaUsers, FaShieldAlt, FaMapMarkedAlt, FaBalanceScale } from 'react-icons/fa'
 import './LandingPage.css?v=2'
 
-// LandingPage es la pagina publica de presentacion del hotel.
-// Tiene 4 secciones: Navbar, Hero, Beneficios y Footer.
-// El aspirante llega aqui primero y desde aqui va al formulario.
 function LandingPage() {
+  // Hook de navegación reactiva para redirigir al portal de postulación (/postular)
   const navigate = useNavigate()
 
-  // Funcion para hacer scroll suave a la seccion de beneficios
+  // Desplazamiento suave hacia la sección informativa de beneficios
   const scrollABeneficios = () => {
     document.getElementById('beneficios').scrollIntoView({ behavior: 'smooth' })
   }
@@ -16,12 +23,12 @@ function LandingPage() {
   return (
     <div className="landing">
 
-      {/* ---- NAVBAR ---- */}
+      {/* Cabecera de navegación superior (Navbar) */}
       <nav className="navbar">
         <div className="navbar-inner">
           <img
             src="/Margarita-Village-logo.png"
-            alt="Hotel Margarita Village"
+            alt="Isotipo del Hotel Margarita Village"
             className="navbar-logo"
           />
           <div className="navbar-links">
@@ -38,9 +45,8 @@ function LandingPage() {
         </div>
       </nav>
 
-      {/* ---- HERO ---- */}
+      {/* Sección principal de llamada a la acción (Hero Banner) */}
       <section className="hero" id="inicio">
-        {/* Particulas decorativas de fondo */}
         <div className="hero-particles">
           <span></span><span></span><span></span>
         </div>
@@ -77,7 +83,7 @@ function LandingPage() {
             </button>
           </div>
 
-          {/* Estadisticas decorativas */}
+          {/* Ficha de estadísticas representativas */}
           <div className="hero-stats">
             <div className="stat">
               <span className="stat-numero">+200</span>
@@ -96,17 +102,17 @@ function LandingPage() {
           </div>
         </div>
 
-        {/* Indicador de scroll */}
+        {/* Indicador visual de desplazamiento hacia abajo */}
         <div className="scroll-indicator" onClick={scrollABeneficios}>
           <div className="scroll-dot"></div>
         </div>
       </section>
 
-      {/* ---- SECCION BENEFICIOS ---- */}
+      {/* Sección informativa de pilares y beneficios laborales */}
       <section className="beneficios" id="beneficios">
         <div className="seccion-inner">
           <div className="seccion-header">
-            <span className="seccion-etiqueta">Por que elegirnos</span>
+            <span className="seccion-etiqueta">Por qué elegirnos</span>
             <h2>Trabaja en un ambiente<br />de clase mundial</h2>
             <div className="gold-line" style={{ margin: '16px auto 0' }}></div>
           </div>
@@ -115,7 +121,7 @@ function LandingPage() {
             <div className="card-beneficio">
               <div className="card-icono"><FaRegBuilding /></div>
               <h3>Ambiente Profesional</h3>
-              <p>Trabajaras en instalaciones de primer nivel, rodeada de un equipo comprometido con la excelencia.</p>
+              <p>Trabajarás en instalaciones de primer nivel, rodeado de un equipo comprometido con la excelencia.</p>
             </div>
 
             <div className="card-beneficio card-destacada">
@@ -127,7 +133,7 @@ function LandingPage() {
             <div className="card-beneficio">
               <div className="card-icono"><FaUsers /></div>
               <h3>Equipo Unido</h3>
-              <p>Formaras parte de una familia de mas de 200 colaboradores comprometidos con el buen servicio.</p>
+              <p>Formarás parte de una familia de más de 200 colaboradores comprometidos con el buen servicio.</p>
             </div>
 
             <div className="card-beneficio">
@@ -139,38 +145,67 @@ function LandingPage() {
             <div className="card-beneficio">
               <div className="card-icono"><FaMapMarkedAlt /></div>
               <h3>Mejor Destino</h3>
-              <p>Trabaja en uno de los destinos turisticos mas importantes de Venezuela, en Porlamar, Nueva Esparta.</p>
+              <p>Trabaja en uno de los destinos turísticos más importantes de Venezuela, en Porlamar, Nueva Esparta.</p>
             </div>
 
             <div className="card-beneficio">
               <div className="card-icono"><FaBalanceScale /></div>
               <h3>Proceso Justo</h3>
-              <p>Nuestro proceso de seleccion es transparente, basado en criterios objetivos y sin favoritismos.</p>
+              <p>Nuestro proceso de selección es transparente, basado en criterios objetivos y sin favoritismos.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ---- CTA CENTRAL ---- */}
+      {/* Sección de Galería (Nuestras Instalaciones) */}
+      <section className="galeria-instalaciones">
+        <div className="seccion-inner">
+          <div className="seccion-header">
+            <span className="seccion-etiqueta">Nuestras Instalaciones</span>
+            <h2>Forma parte de la experiencia<br />Margarita Village</h2>
+            <div className="gold-line" style={{ margin: '16px auto 0' }}></div>
+          </div>
+          
+          <div className="bento-grid">
+            <div className="bento-item grande">
+              <img src="/MV-FOTO4.jpg" alt="Vista aérea de la piscina" />
+            </div>
+            <div className="bento-item">
+              <img src="/MV-FOTO.jpg" alt="Piscina y palmeras" />
+            </div>
+            <div className="bento-item">
+              <img src="/MV-FOTO3.jpg" alt="Restaurante" />
+            </div>
+            <div className="bento-item horizontal">
+              <img src="/MV-FOTO2.jpg" alt="Churuata principal" />
+            </div>
+            <div className="bento-item">
+              <img src="/MV-FOTO1.jpg" alt="Piscinas" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección de cierre y llamada a la acción secundario */}
       <section className="cta-section">
         <div className="cta-inner">
-          <h2>Listo para dar el siguiente paso?</h2>
-          <p>Registra tu postulacion ahora. El proceso es rapido, desde cualquier dispositivo.</p>
+          <h2>¿Listo para dar el siguiente paso?</h2>
+          <p>Registra tu postulación ahora. El proceso es rápido y accesible desde cualquier dispositivo.</p>
           <button
             className="btn-primary btn-grande"
             id="btn-postularme-cta"
             onClick={() => navigate('/postular')}
           >
-            Comenzar mi postulacion →
+            Comenzar mi postulación →
           </button>
         </div>
       </section>
 
-      {/* ---- FOOTER ---- */}
+      {/* Pie de página institucional (Footer) */}
       <footer className="footer" id="footer">
         <div className="footer-inner">
           <div className="footer-logo">
-            <img src="/Margarita-Village-logo.png" alt="Margarita Village" height="60" />
+            <img src="/Margarita-Village-logo.png" alt="Logo Hotel Margarita Village" height="60" />
           </div>
           <div className="footer-info">
             <p>Hotel Margarita Village Hotel & Resort</p>
@@ -178,7 +213,7 @@ function LandingPage() {
           </div>
           <div className="footer-copy">
             <p>© 2026 Hotel Margarita Village. Todos los derechos reservados.</p>
-            <p>Sistema SIGCS — Desarrollado como Trabajo de Grado, UDO Nueva Esparta.</p>
+            <p>Sistema SICS — Desarrollado como Trabajo de Grado, UDO Nueva Esparta.</p>
           </div>
         </div>
       </footer>
@@ -188,3 +223,4 @@ function LandingPage() {
 }
 
 export default LandingPage
+

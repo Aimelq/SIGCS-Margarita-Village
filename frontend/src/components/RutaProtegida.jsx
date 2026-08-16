@@ -1,25 +1,33 @@
+// ============================================================
+// COMPONENTE DE RUTA PROTEGIDA (Guard / Protected Route)
+// Sistema SICS - Hotel Margarita Village
+//
+// Funciona como una barrera de seguridad de navegación en el cliente.
+// Verifica si existe un usuario autenticado activo en el AuthContext.
+// Si el usuario no está logueado, redirige a la página de login.
+// Si está autenticado, habilita el renderizado de la ruta solicitada.
+// ============================================================
+
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-// Este es un componente de orden superior (HOC - Higher Order Component).
-// Sirve como un "guardaespaldas" para las rutas privadas del panel interno.
-// Si alguien intenta entrar a /dashboard sin estar logueado, lo patea hacia afuera.
 const RutaProtegida = () => {
-  // Extraigo al usuario del Contexto de Autenticación
+  // Extrae la información del usuario desde el contexto de autenticación
   const { usuario } = useAuth();
 
-  // Si no hay usuario logueado en memoria, lo redirijo a la página de login
-  // usando el componente <Navigate /> de React Router.
-  // El atributo "replace" borra el historial del navegador para que 
-  // el usuario no pueda darle al botón "Atrás" y volver al dashboard.
+  // Si no existe un usuario activo en el estado global:
+  // Redirige hacia la ruta de inicio de sesión (/login).
+  // La propiedad 'replace' sobrescribe el historial de navegación para prevenir
+  // que el usuario regrese a la pantalla protegida con el botón 'Atrás' del navegador.
   if (!usuario) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si SÍ hay usuario, dejo que pase y renderizo lo que estaba intentando ver
-  // <Outlet /> es un componente de React Router que renderiza las "rutas hijas"
-  // Por ejemplo, si la ruta es /dashboard/expediente/123, Outlet renderizará ExpedientePage
+  // Si la autenticación es válida:
+  // El componente <Outlet /> de React Router renderiza dinámicamente
+  // la ruta hija solicitada (Dashboard, Candidatos, Expediente).
   return <Outlet />;
 };
 
 export default RutaProtegida;
+

@@ -1,0 +1,223 @@
+/* ============================================================
+   CANDIDATOS PAGE
+============================================================ */
+
+.candidatos-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── CABECERA ── */
+.cand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cand-titulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--azul);
+  margin: 0 0 3px 0;
+}
+
+.cand-subtitulo {
+  font-size: 13px;
+  color: var(--texto-mut);
+  margin: 0;
+}
+
+/* ── BARRA DE FILTROS ── */
+.cand-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  box-shadow: var(--sombra-sm);
+}
+
+.cand-search-box,
+.cand-filter-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radius-md);
+  padding: 7px 12px;
+  background: var(--bg-main);
+  min-width: 180px;
+  flex: 1;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cand-search-box:focus-within,
+.cand-filter-box:focus-within {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(30,58,95,0.09);
+  background: #fff;
+}
+
+.cand-search-icon,
+.cand-filter-icon {
+  color: var(--texto-mut);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.cand-search-box input,
+.cand-filter-box select,
+.cand-filter-box input,
+.cand-inline-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: var(--texto);
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+.cand-search-box input::placeholder,
+.cand-filter-box input::placeholder { color: #9ca3af; }
+
+.cand-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--texto-mut);
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.cand-clear-btn:hover { color: var(--rojo); background: #fee2e2; }
+
+.cand-date-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cand-date-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radius-md);
+  padding: 7px 12px;
+  background: var(--bg-main);
+  transition: border-color 0.2s;
+}
+.cand-date-box:focus-within {
+  border-color: var(--azul);
+  background: #fff;
+}
+
+.cand-date-icon { color: var(--texto-mut); font-size: 13px; flex-shrink: 0; }
+
+.cand-date-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-mut);
+  white-space: nowrap;
+}
+
+.cand-date-box input[type="date"] {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--texto);
+  font-family: 'Inter', sans-serif;
+}
+
+.cand-reset-btn {
+  padding: 8px 16px;
+  background: #fee2e2;
+  color: var(--rojo);
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.cand-reset-btn:hover { background: #fecaca; }
+
+/* ── TABLA WRAPPER ── */
+.cand-table-wrap {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sombra-sm);
+  overflow: hidden;
+}
+
+.cand-cedula {
+  font-weight: 600;
+  color: var(--texto-mut);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── EMPTY + LOADING ── */
+.cand-loading,
+.cand-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 4rem 2rem;
+  color: var(--texto-mut);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ── PAGINACIÓN ── */
+.cand-paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.cand-pag-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--azul);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.cand-pag-btn:hover:not(:disabled) {
+  background: var(--azul);
+  color: #fff;
+  border-color: var(--azul);
+}
+.cand-pag-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cand-pag-info {
+  font-size: 13px;
+  color: var(--texto-mut);
+}

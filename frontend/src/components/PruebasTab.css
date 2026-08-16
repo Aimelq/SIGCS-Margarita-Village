@@ -1,0 +1,71 @@
+.pruebas-tab-container {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.pruebas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+}
+
+.pruebas-header h3 {
+  margin: 0 0 4px 0;
+  color: #1e293b;
+}
+
+.examenes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.examen-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  transition: box-shadow 0.2s;
+}
+
+.examen-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-color: #cbd5e1;
+}
+
+.examen-info h4 {
+  margin: 0 0 8px 0;
+  color: #0f172a;
+}
+
+.examen-info p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.examen-estado {
+  margin-top: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+}
+
+.empty-state p {
+  margin-top: 12px;
+  font-size: 1rem;
+}

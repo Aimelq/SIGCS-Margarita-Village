@@ -1,60 +1,79 @@
+// ============================================================
+// PUNTO DE ENTRADA PRINCIPAL (App.jsx)
+// Sistema SICS - Hotel Margarita Village
+//
+// Define la jerarquía global de enrutamiento mediante React Router.
+// Configura las rutas públicas (Portal de postulantes, inicio de sesión)
+// y las rutas privadas (Panel de reclutamiento y expediente de candidatos),
+// envolviendo la aplicación en el proveedor global AuthProvider.
+// ============================================================
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import RutaProtegida from './components/RutaProtegida'
 import DashboardLayout from './components/DashboardLayout'
 
-// Páginas Públicas
+// Páginas Públicas (Accesibles por candidatos y visitantes)
 import LandingPage from './pages/LandingPage'
 import PostularPage from './pages/PostularPage'
 
-// Páginas Privadas (Panel Interno)
+// Páginas Privadas (Acceso exclusivo para reclutadores autenticados)
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import ExpedientePage from './pages/ExpedientePage'
+import CandidatosPage from './pages/CandidatosPage'
+
+// Módulo Sprint 7: Banco de preguntas técnicas para exámenes de candidatos
+import ExamenesPage from './pages/ExamenesPage'
+
+// Módulo Sprint 8: Evaluación pública de candidatos
+import ExamenCandidatoPage from './pages/ExamenCandidatoPage'
 
 import './index.css'
 import './App.css'
 
-// App es el punto de entrada de toda la aplicacion.
-// Envolvemos todo en <AuthProvider> para que cualquier componente
-// pueda saber si hay un usuario logueado o no.
 function App() {
   return (
+    // Envuelve todo el árbol de componentes en AuthProvider para exponer el estado de sesión
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* ================= RUTAS PÚBLICAS ================= */}
-          {/* La página de inicio del hotel */}
+          {/* ---------------- RUTAS PÚBLICAS ---------------- */}
+          {/* Página de inicio institucional del hotel */}
           <Route path="/" element={<LandingPage />} />
           
-          {/* El formulario donde el aspirante se postula */}
+          {/* Portal dinámico de postulación para aspirantes */}
           <Route path="/postular" element={<PostularPage />} />
           
-          {/* La página para que el reclutador inicie sesión */}
+          {/* Pantalla de inicio de sesión para el personal de Selección */}
           <Route path="/login" element={<LoginPage />} />
 
-          {/* ================= RUTAS PRIVADAS ================= */}
+          {/* Portal de Evaluación del Candidato (Sprint 8) */}
+          <Route path="/evaluacion/:token" element={<ExamenCandidatoPage />} />
+
+          {/* ---------------- RUTAS PRIVADAS ---------------- */}
           {/* 
-            RutaProtegida verifica si hay un token válido.
-            Si no lo hay, patea al usuario a /login.
-            Si lo hay, permite acceder a las rutas que están dentro (hijas).
+            El componente <RutaProtegida /> actúa como un filtro de seguridad.
+            Si no hay un token válido en sesión, redirige hacia /login.
           */}
           <Route element={<RutaProtegida />}>
             
             {/* 
-              DashboardLayout envuelve a todas las páginas internas, 
-              proveyendo el Sidebar izquierdo y el Header superior. 
+              DashboardLayout suministra la barra lateral (Sidebar) y la cabecera (Header).
+              Todas las rutas anidadas en su interior se renderizan dentro de su <Outlet />.
             */}
             <Route element={<DashboardLayout />}>
-              {/* Página principal con las métricas y tabla de recientes */}
+              {/* Vista del panel principal con métricas y postulaciones recientes */}
               <Route path="/dashboard" element={<DashboardPage />} />
               
-              {/* Página del perfil detallado de un candidato específico */}
+              {/* Vista del perfil 360° y expediente digital de un candidato */}
               <Route path="/dashboard/expediente/:cedula" element={<ExpedientePage />} />
-              
-              {/* Estas rutas quedarían para los próximos sprints */}
-              {/* <Route path="/dashboard/candidatos" element={<ListaCandidatosPage />} /> */}
-              {/* <Route path="/dashboard/evaluaciones" element={<EvaluacionesPage />} /> */}
+
+              {/* Vista del catálogo maestro de candidatos con paginación y filtros */}
+              <Route path="/dashboard/candidatos" element={<CandidatosPage />} />
+
+              {/* Vista del banco de preguntas técnicas — Sprint 7 */}
+              <Route path="/dashboard/examenes" element={<ExamenesPage />} />
             </Route>
             
           </Route>
@@ -66,3 +85,4 @@ function App() {
 }
 
 export default App
+

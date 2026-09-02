@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './ExamenCandidatoPage.css';
-import { FiCheckCircle, FiLoader } from 'react-icons/fi';
+import { FiCheckCircle, FiLoader, FiClock, FiAlertTriangle } from 'react-icons/fi';
+
+const DURACION_MINUTOS = 45; // 45 minutos para el examen
 
 const ExamenCandidatoPage = () => {
   const { token } = useParams();
@@ -12,7 +14,9 @@ const ExamenCandidatoPage = () => {
   const [respuestas, setRespuestas] = useState({});
   const [enviando, setEnviando] = useState(false);
   const [finalizado, setFinalizado] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState(null);
 
+  // Efecto para inicializar el examen
   useEffect(() => {
     cargarExamen();
   }, [token]);
@@ -21,6 +25,7 @@ const ExamenCandidatoPage = () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/evaluacion/${token}`);
       setExamen(res.data);
+      iniciarTemporizador(token);
     } catch (err) {
       setError(err.response?.data?.error || 'Error al cargar el examen. Es posible que el enlace no sea válido o haya expirado.');
     } finally {
@@ -35,14 +40,58 @@ const ExamenCandidatoPage = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (Object.keys(respuestas).length < examen.preguntas.length) {
+  const iniciarTemporizador = (currentToken) => {
+    const storageKey = `examen_inicio_${currentToken}`;
+    let inicio = localStorage.getItem(storageKey);
+    
+    if (!inicio) {
+      inicio = Date.now().toString();
+      localStorage.setItem(storageKey, inicio);
+    }
+
+    const tiempoPasado = Math.floor((Date.now() - parseInt(inicio)) / 1000);
+    const tiempoTotalSegundos = DURACION_MINUTOS * 60;
+    let restante = tiempoTotalSegundos - tiempoPasado;
+
+    if (restante <= 0) {
+      restante = 0;
+    }
+    
+    setTiempoRestante(restante);
+  };
+
+  // Efecto para el contador regresivo
+  useEffect(() => {
+    if (tiempoRestante === null || finalizado || cargando || enviando) return;
+
+    if (tiempoRestante <= 0) {
+      alert('¡El tiempo se ha agotado! Tus respuestas actuales serán enviadas automáticamente.');
+      handleSubmit(null, true);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTiempoRestante(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [tiempoRestante, finalizado, cargando, enviando]);
+
+  const handleSubmit = async (e, autoSubmit = false) => {
+    if (e) e.preventDefault();
+    
+    if (!autoSubmit && Object.keys(respuestas).length < examen.preguntas.length) {
       alert('Por favor, responde todas las preguntas antes de enviar el examen.');
       return;
     }
 
-    if (!window.confirm('¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.')) {
+    if (!autoSubmit && !window.confirm('¿Estás seguro de enviar tus respuestas? No podrás modificarlas después.')) {
       return;
     }
 
@@ -57,6 +106,7 @@ const ExamenCandidatoPage = () => {
 
       await axios.post(`http://localhost:5000/api/evaluacion/${token}`, payload);
       setFinalizado(true);
+      localStorage.removeItem(`examen_inicio_${token}`); // Limpiar storage al finalizar
     } catch (err) {
       alert(err.response?.data?.error || 'Error al enviar las respuestas');
     } finally {
@@ -93,8 +143,25 @@ const ExamenCandidatoPage = () => {
     );
   }
 
+  // Formatear tiempo MM:SS
+  const formatearTiempo = (segundos) => {
+    const m = Math.floor(segundos / 60).toString().padStart(2, '0');
+    const s = (segundos % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   return (
     <div className="examen-public-container">
+      {/* ── TEMPORIZADOR STICKY ── */}
+      {tiempoRestante !== null && !finalizado && (
+        <div className={`temporizador-sticky ${tiempoRestante < 300 ? 'tiempo-critico' : ''}`}>
+          <div className="temporizador-inner">
+            {tiempoRestante < 300 ? <FiAlertTriangle size={20} /> : <FiClock size={20} />}
+            <span>Tiempo restante: <strong>{formatearTiempo(tiempoRestante)}</strong></span>
+          </div>
+        </div>
+      )}
+
       <div className="examen-public-header">
         <h1>Evaluación Psicotécnica</h1>
         <p>Candidato: <strong>{examen.candidato}</strong></p>

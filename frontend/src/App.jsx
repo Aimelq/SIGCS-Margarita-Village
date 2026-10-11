@@ -29,6 +29,9 @@ import ExamenesPage from './pages/ExamenesPage'
 // Módulo Sprint 8: Evaluación pública de candidatos
 import ExamenCandidatoPage from './pages/ExamenCandidatoPage'
 
+// Módulo Sprint 9: Reportes Ejecutivos & Analítica de Selección
+import ReportesPage from './pages/ReportesPage'
+
 import './index.css'
 import './App.css'
 
@@ -74,6 +77,9 @@ function App() {
 
               {/* Vista del banco de preguntas técnicas — Sprint 7 */}
               <Route path="/dashboard/examenes" element={<ExamenesPage />} />
+
+              {/* Módulo de Reportes Ejecutivos y Analítica — Sprint 9 */}
+              <Route path="/dashboard/reportes" element={<ReportesPage />} />
             </Route>
             
           </Route>

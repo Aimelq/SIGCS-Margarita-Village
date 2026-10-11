@@ -11,7 +11,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FiCheckCircle } from 'react-icons/fi'
+import { FiCheckCircle, FiUserPlus, FiUserCheck } from 'react-icons/fi'
 import api from '../api/axios'
 import FormularioPostulacion from '../components/FormularioPostulacion'
 import './PostularPage.css'
@@ -101,7 +101,7 @@ function PostularPage() {
           <div className="gold-line" style={{ margin: '16px auto' }}></div>
           <p>
             Gracias, <strong>{nombreConfirmacion}</strong>. Hemos recibido su información
-            correctamente y ha sido registrada en el sistema SICS.
+            correctamente y ha sido registrada.
           </p>
           <p style={{ marginTop: '12px' }}>
             El departamento de Talento Humano del Hotel Margarita Village
@@ -139,7 +139,7 @@ function PostularPage() {
         {/* Mensaje informativo del estado del candidato */}
         {paso === 'existente' ? (
           <div className="banner-existente fade-in-up">
-            <span className="banner-icono">[Aspirante Registrado]</span>
+            <FiUserCheck className="banner-icono" />
             <div>
               <strong>Bienvenido/a de vuelta, {datosExistentes.nombre}</strong>
               <p>Su perfil se encuentra registrado en el sistema. Puede actualizar su información y postularse al cargo deseado.</p>
@@ -147,7 +147,7 @@ function PostularPage() {
           </div>
         ) : (
           <div className="banner-nuevo fade-in-up">
-            <span className="banner-icono">[Nuevo Registro]</span>
+            <FiUserPlus className="banner-icono" />
             <div>
               <strong>Cédula verificada. ¡Complete sus datos para postularse!</strong>
               <p>Es su primera postulación en el sistema. Por favor complete el formulario a continuación.</p>

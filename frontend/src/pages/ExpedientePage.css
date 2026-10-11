@@ -550,3 +550,63 @@ textarea.modal-input { min-height: 100px; resize: vertical; }
 .spin-icon {
   animation: spin 0.9s linear infinite;
 }
+
+/* ── MEDIA QUERIES RESPONSIVAS ── */
+@media (max-width: 768px) {
+  .perfil-header {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .perfil-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .perfil-title h1 {
+    font-size: 1.25rem;
+  }
+  .tabs-container {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: var(--radius-lg);
+  }
+  .tabs-container::-webkit-scrollbar {
+    display: none;
+  }
+  .tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  .card-tab-content {
+    padding: 16px;
+    border-radius: var(--radius-lg);
+  }
+  .seccion {
+    padding: 16px;
+  }
+  .modal-content {
+    max-width: 94vw;
+    padding: 20px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  .doc-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .btn-download {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

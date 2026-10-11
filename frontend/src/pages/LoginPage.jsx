@@ -69,7 +69,7 @@ const LoginPage = () => {
         <div className="login-header">
           <img src="/Margarita-Village-logo.png" alt="Logo Hotel Margarita Village" className="login-logo" />
           <h2>Portal de Selección de Talento Humano</h2>
-          <p>Sistema SICS - Ingrese sus credenciales de acceso</p>
+          <p>Ingrese sus credenciales de acceso</p>
         </div>
 
         {/* Mensaje de error de credenciales */}

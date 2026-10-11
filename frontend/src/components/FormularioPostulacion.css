@@ -77,6 +77,23 @@
   color: var(--azul);
 }
 
+@media (max-width: 500px) {
+  .step-label {
+    display: none;
+  }
+  .step.active .step-label {
+    display: block;
+    font-size: 11px;
+  }
+  .stepper::before {
+    left: 15px;
+    right: 15px;
+  }
+  .step {
+    padding: 0 5px;
+  }
+}
+
 /* ---- GRIDS DEL FORMULARIO ---- */
 .form-grid {
   display: grid;

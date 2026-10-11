@@ -23,7 +23,9 @@ const ExamenCandidatoPage = () => {
 
   const cargarExamen = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/evaluacion/${token}`);
+      const res = await axios.get(`/api/evaluacion/${token}`, {
+        headers: { 'Bypass-Tunnel-Reminder': 'true' }
+      });
       setExamen(res.data);
       iniciarTemporizador(token);
     } catch (err) {
@@ -104,7 +106,9 @@ const ExamenCandidatoPage = () => {
         }))
       };
 
-      await axios.post(`http://localhost:5000/api/evaluacion/${token}`, payload);
+      await axios.post(`/api/evaluacion/${token}`, payload, {
+        headers: { 'Bypass-Tunnel-Reminder': 'true' }
+      });
       setFinalizado(true);
       localStorage.removeItem(`examen_inicio_${token}`); // Limpiar storage al finalizar
     } catch (err) {

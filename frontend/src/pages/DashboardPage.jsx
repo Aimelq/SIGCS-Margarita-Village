@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FiUserPlus, FiUsers, FiEye, FiCheckCircle,
-  FiSearch, FiArrowRight, FiLoader
+  FiSearch, FiArrowRight, FiLoader, FiTrendingUp, FiBarChart2, FiAward
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
@@ -94,31 +94,49 @@ const DashboardPage = () => {
     );
   }
 
-  // Estructura de tarjetas de indicadores clave
+  // Estructura de tarjetas de indicadores clave (6 KPIs)
   const CARDS = [
     {
       icon: <FiUserPlus size={20} />,
       bg: 'bg-blue-100',
       label: 'Postulados esta semana',
-      value: metricas?.postulados_semana ?? 0
+      value: metricas?.postulados_semana ?? 0,
+      sub: 'Últimos 7 días'
     },
     {
       icon: <FiUsers size={20} />,
       bg: 'bg-orange-100',
       label: 'Total aspirantes',
-      value: metricas?.total_aspirantes ?? 0
+      value: metricas?.total_aspirantes ?? 0,
+      sub: 'Registros históricos'
     },
     {
       icon: <FiEye size={20} />,
       bg: 'bg-yellow-100',
       label: 'En revisión',
-      value: metricas?.en_revision ?? 0
+      value: metricas?.en_revision ?? 0,
+      sub: 'Pendientes de decisión'
     },
     {
       icon: <FiCheckCircle size={20} />,
       bg: 'bg-green-100',
       label: 'Seleccionados',
-      value: metricas?.aptos ?? 0
+      value: metricas?.aptos ?? 0,
+      sub: 'Contrataciones confirmadas'
+    },
+    {
+      icon: <FiTrendingUp size={20} />,
+      bg: 'bg-teal-100',
+      label: 'Tasa de conversión',
+      value: `${metricas?.tasa_conversion ?? 0}%`,
+      sub: 'Seleccionados / Total'
+    },
+    {
+      icon: <FiAward size={20} />,
+      bg: 'bg-purple-100',
+      label: 'Prom. examen técnico',
+      value: metricas?.promedio_examen ?? 0,
+      sub: 'Puntos promedio / 20'
     },
   ];
 
@@ -129,7 +147,7 @@ const DashboardPage = () => {
       <div className="dash-header-section">
         <div className="dash-welcome">
           <h1>Bienvenido/a, {usuario?.nombre?.split(' ')[0] || 'Reclutador'}</h1>
-          <p>Resumen de captación de talento — Sistema SICS</p>
+          <p>Resumen de captación de talento</p>
         </div>
 
         {/* Buscador maestro con autocompletado desplegable */}
@@ -182,9 +200,25 @@ const DashboardPage = () => {
             <div className="metric-info">
               <h3>{card.label}</h3>
               <p className="metric-value">{card.value}</p>
+              {card.sub && <span className="metric-sub">{card.sub}</span>}
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Acceso rápido al módulo de Analítica */}
+      <div className="dash-quick-actions">
+        <div className="dash-quick-label">
+          <FiBarChart2 size={15} />
+          <span>Inteligencia de Selección</span>
+        </div>
+        <button
+          className="btn-secondary"
+          onClick={() => navigate('/dashboard/reportes')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+        >
+          Ver Reportes & Analítica completa <FiArrowRight size={13} />
+        </button>
       </div>
 
       {/* Tabla de postulaciones recientes */}

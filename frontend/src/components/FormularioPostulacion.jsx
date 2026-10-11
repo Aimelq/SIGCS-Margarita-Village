@@ -10,7 +10,7 @@
 //   Paso 4: Adjunto de Currículum Vitae (PDF) y Cierre.
 // ============================================================
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import api from '../api/axios'
 import { FiCheck, FiFileText, FiUploadCloud } from 'react-icons/fi'
 import './FormularioPostulacion.css'
@@ -44,7 +44,10 @@ const CARGOS_RESORT = [
 
 function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExito }) {
   // Estado para controlar el número de paso activo en el wizard (1 a 4)
-  const [pasoActual, setPasoActual] = useState(1)
+  const [pasoActual, setPasoActual] = useState(() => {
+    const guardado = sessionStorage.getItem(`sics_paso_${cedula}`)
+    return guardado ? parseInt(guardado, 10) : 1
+  })
 
   // Estado de carga mientras se envían las peticiones HTTP al servidor
   const [cargando, setCargando] = useState(false)
@@ -55,36 +58,49 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
   // Referencia física para activar el selector oculto de archivos PDF
   const fileInputRef = useRef(null)
 
-  // Estado unificado con los campos del formulario pre-poblados si el candidato ya existe
-  const [form, setForm] = useState({
-    nombre: datosIniciales?.nombre || '',
-    apellido: datosIniciales?.apellido || '',
-    correo: datosIniciales?.correo || datosIniciales?.email || '',
-    telefono: datosIniciales?.telefono || '',
-    edad: datosIniciales?.edad || '',
-    sexo: datosIniciales?.sexo || '',
-    lugar_nacimiento: datosIniciales?.lugar_nacimiento || '',
-    direccion: datosIniciales?.direccion || '',
-    formacion: datosIniciales?.formacion || '',
-    
-    // Campos específicos del perfil de postulación
-    municipio: datosIniciales?.municipio || datosIniciales?.municipio_postulacion || '',
-    estado_civil: datosIniciales?.estado_civil || '',
-    empleo_solicitado: datosIniciales?.empleo_solicitado || '',
-    sueldo_aspira: datosIniciales?.sueldo_aspira || '',
-    trabaja_actualmente: datosIniciales?.trabaja_actualmente || '',
-    experiencia_ultimos_empleos: datosIniciales?.experiencia_ultimos_empleos || '',
-    habilidades: datosIniciales?.habilidades || '',
-    fortalezas: datosIniciales?.fortalezas || '',
-    referencias: datosIniciales?.referencias || '',
-    motivacion: datosIniciales?.motivacion || '',
-    disponibilidad_rotativa: datosIniciales?.disponibilidad_rotativa ? 'Sí' : (datosIniciales?.disponibilidad_rotativa === false ? 'No' : ''),
-    disponibilidad_fines: datosIniciales?.disponibilidad_fines ? 'Sí' : (datosIniciales?.disponibilidad_fines === false ? 'No' : ''),
-    carga_familiar: datosIniciales?.carga_familiar || '',
-    data_bancaria: datosIniciales?.data_bancaria || '',
-    medio_transporte: datosIniciales?.medio_transporte || '',
-    tipo_vehiculo: datosIniciales?.tipo_vehiculo || ''
+  // Estado unificado con los campos del formulario
+  const [form, setForm] = useState(() => {
+    const formGuardado = sessionStorage.getItem(`sics_form_${cedula}`)
+    if (formGuardado) {
+      return JSON.parse(formGuardado)
+    }
+    return {
+      nombre: datosIniciales?.nombre || '',
+      apellido: datosIniciales?.apellido || '',
+      correo: datosIniciales?.correo || datosIniciales?.email || '',
+      telefono: datosIniciales?.telefono || '',
+      edad: datosIniciales?.edad || '',
+      sexo: datosIniciales?.sexo || '',
+      lugar_nacimiento: datosIniciales?.lugar_nacimiento || '',
+      direccion: datosIniciales?.direccion || '',
+      formacion: datosIniciales?.formacion || '',
+      municipio: datosIniciales?.municipio || datosIniciales?.municipio_postulacion || '',
+      estado_civil: datosIniciales?.estado_civil || '',
+      empleo_solicitado: datosIniciales?.empleo_solicitado || '',
+      sueldo_aspira: datosIniciales?.sueldo_aspira || '',
+      trabaja_actualmente: datosIniciales?.trabaja_actualmente || '',
+      experiencia_ultimos_empleos: datosIniciales?.experiencia_ultimos_empleos || '',
+      habilidades: datosIniciales?.habilidades || '',
+      fortalezas: datosIniciales?.fortalezas || '',
+      referencias: datosIniciales?.referencias || '',
+      motivacion: datosIniciales?.motivacion || '',
+      disponibilidad_rotativa: datosIniciales?.disponibilidad_rotativa ? 'Sí' : (datosIniciales?.disponibilidad_rotativa === false ? 'No' : ''),
+      disponibilidad_fines: datosIniciales?.disponibilidad_fines ? 'Sí' : (datosIniciales?.disponibilidad_fines === false ? 'No' : ''),
+      carga_familiar: datosIniciales?.carga_familiar || '',
+      data_bancaria: datosIniciales?.data_bancaria || '',
+      medio_transporte: datosIniciales?.medio_transporte || '',
+      tipo_vehiculo: datosIniciales?.tipo_vehiculo || ''
+    }
   })
+
+  // Persistir en sessionStorage cada vez que cambia el form o el paso
+  useEffect(() => {
+    sessionStorage.setItem(`sics_form_${cedula}`, JSON.stringify(form))
+  }, [form, cedula])
+
+  useEffect(() => {
+    sessionStorage.setItem(`sics_paso_${cedula}`, pasoActual)
+  }, [pasoActual, cedula])
 
   // Archivo PDF del currículum vitae seleccionado por el usuario
   const [cvFile, setCvFile] = useState(null)
@@ -185,6 +201,10 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
           headers: { 'Content-Type': 'multipart/form-data' }
         })
       }
+
+      // Limpiamos el storage local tras el éxito
+      sessionStorage.removeItem(`sics_form_${cedula}`)
+      sessionStorage.removeItem(`sics_paso_${cedula}`)
 
       onExito(form.nombre)
     } catch (err) {
@@ -446,16 +466,6 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
               </select>
             </div>
 
-            {form.medio_transporte === 'Vehículo propio' && (
-              <div className="form-group">
-                <label className="form-label">Tipo de Vehículo</label>
-                <select name="tipo_vehiculo" className="input-field" value={form.tipo_vehiculo} onChange={handleChange}>
-                  <option value="">Elige...</option>
-                  <option value="Carro">Carro</option>
-                  <option value="Moto">Moto</option>
-                </select>
-              </div>
-            )}
 
             <div className="form-group full-width">
               <label className="form-label">Detalle su carga familiar *</label>
@@ -494,7 +504,7 @@ function FormularioPostulacion({ cedula, datosIniciales, esActualizacion, onExit
           <div className="form-actions">
             <button className="btn-secondary" onClick={() => setPasoActual(3)} disabled={cargando}>← Atrás</button>
             <button className="btn-primary" onClick={enviarFormulario} disabled={cargando}>
-              {cargando ? <><span className="spinner"></span> Procesando...</> : 'Enviar Postulación 🚀'}
+              {cargando ? <><span className="spinner"></span> Procesando...</> : 'Enviar Postulación'}
             </button>
           </div>
         </div>

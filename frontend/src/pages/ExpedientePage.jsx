@@ -31,6 +31,7 @@ const ExpedientePage = () => {
   const [historial, setHistorial] = useState([]);
   const [tabActiva, setTabActiva] = useState('perfil');
   const [cargando, setCargando] = useState(true);
+  const [descargandoFicha, setDescargandoFicha] = useState(false);
 
   // Estados para la ventana modal de cambio manual de estado
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -146,6 +147,31 @@ const ExpedientePage = () => {
     }
   };
 
+  // DESCARGA DE FICHA TÉCNICA / SOLICITUD DE EMPLEO EN PDF:
+  // Descarga el documento oficial formateado con logo, tablas y firmas,
+  // disponible en cualquier etapa del proceso (incluso antes de entrevistas o pruebas).
+  const handleDescargarFicha = async () => {
+    setDescargandoFicha(true);
+    try {
+      const response = await api.get(`/api/aspirantes/${cedula}/ficha-pdf`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Ficha_Candidato_${aspirante?.nombre || ''}_${aspirante?.apellido || ''}_${cedula}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('No se pudo generar la ficha técnica en PDF.');
+      console.error(err);
+    } finally {
+      setDescargandoFicha(false);
+    }
+  };
+
 
   // ── LOADING ──
   if (cargando) {
@@ -179,6 +205,16 @@ const ExpedientePage = () => {
           </div>
         </div>
         <div className="perfil-actions">
+          <button
+            className="btn-secondary"
+            onClick={handleDescargarFicha}
+            disabled={descargandoFicha}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1rem' }}
+            title="Descargar Ficha Técnica / Solicitud de Empleo en PDF con membrete oficial"
+          >
+            {descargandoFicha ? <FiLoader className="spin-icon" size={13} /> : <FiDownload size={13} />}
+            <span>{descargandoFicha ? 'Generando PDF...' : 'Descargar Ficha Técnica'}</span>
+          </button>
           <span className={`badge badge-lg ${getBadgeClass(aspirante.estado)}`}>
             {aspirante.estado || 'Postulado'}
           </span>
@@ -280,8 +316,6 @@ const ExpedientePage = () => {
               <div className="info-grid">
                 {[
                   ['Medio de transporte', aspirante.medio_transporte],
-                  ...(aspirante.medio_transporte === 'Vehículo propio'
-                    ? [['Tipo de vehículo', aspirante.tipo_vehiculo]] : []),
                   ['Información bancaria', aspirante.data_bancaria],
                   ...(aspirante.form_data?.tallas ? [
                     ['Talla camisa', aspirante.form_data.tallas.camisa],

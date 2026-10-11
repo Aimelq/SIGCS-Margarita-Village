@@ -23,3 +23,6 @@ bcrypt>=4.1.0
 # Para manejo seguro de archivos subidos (secure_filename)
 Werkzeug>=2.3.0
 
+# Para generación de fichas y reportes ejecutivos en PDF
+fpdf2>=2.7.0
+

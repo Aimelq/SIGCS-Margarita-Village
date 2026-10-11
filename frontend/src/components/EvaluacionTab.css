@@ -543,3 +543,36 @@
   margin-bottom: 4px;
 }
 .historial-justificacion p { color: var(--texto); margin: 0; }
+
+/* ── MEDIA QUERIES RESPONSIVAS ── */
+@media (max-width: 600px) {
+  .eval-inicio {
+    flex-direction: column;
+    padding: 16px;
+  }
+  .eval-progress-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .criterio-card {
+    padding: 12px;
+  }
+  .criterio-botones {
+    grid-template-columns: 1fr;
+  }
+  .eval-acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-guardar-eval,
+  .btn-cancelar-eval {
+    width: 100%;
+    justify-content: center;
+  }
+  .historial-criterios {
+    grid-template-columns: 1fr;
+  }
+}
+

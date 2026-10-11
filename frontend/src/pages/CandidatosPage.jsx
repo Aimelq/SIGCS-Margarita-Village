@@ -9,7 +9,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiUser, FiFilter, FiChevronLeft, FiChevronRight, FiBookOpen, FiCalendar, FiX, FiArrowRight } from 'react-icons/fi';
+import {
+  FiSearch, FiUser, FiFilter, FiChevronLeft, FiChevronRight,
+  FiBookOpen, FiCalendar, FiX, FiArrowRight, FiDownload, FiLoader
+} from 'react-icons/fi';
 import api from '../api/axios';
 import './CandidatosPage.css';
 
@@ -37,6 +40,7 @@ const CandidatosPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [cargando, setCargando] = useState(true);
+  const [descargandoCedula, setDescargandoCedula] = useState(null);
 
   // Estados para los campos de entrada de filtros
   const [q, setQ] = useState('');
@@ -119,6 +123,29 @@ const CandidatosPage = () => {
     setPage(1);
   };
 
+  // Descarga inmediata de Ficha Técnica / Solicitud en PDF desde el catálogo maestro
+  const handleDescargarFicha = async (cedula, nombre, apellido) => {
+    setDescargandoCedula(cedula);
+    try {
+      const response = await api.get(`/api/aspirantes/${cedula}/ficha-pdf`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Ficha_Candidato_${nombre || ''}_${apellido || ''}_${cedula}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('No se pudo generar la ficha técnica en PDF.');
+      console.error(err);
+    } finally {
+      setDescargandoCedula(null);
+    }
+  };
+
   return (
     <div className="candidatos-page">
 
@@ -126,7 +153,7 @@ const CandidatosPage = () => {
       <div className="cand-header">
         <div>
           <h1 className="cand-titulo">Catálogo General de Candidatos</h1>
-          <p className="cand-subtitulo">{total} aspirante{total !== 1 ? 's' : ''} registrado{total !== 1 ? 's' : ''} en el sistema SICS</p>
+          <p className="cand-subtitulo">{total} aspirante{total !== 1 ? 's' : ''} registrado{total !== 1 ? 's' : ''} en el sistema</p>
         </div>
       </div>
 
@@ -234,7 +261,14 @@ const CandidatosPage = () => {
               {candidatos.map((c) => (
                 <tr key={c.id}>
                   <td className="cand-cedula">{c.cedula}</td>
-                  <td><strong>{c.nombre} {c.apellido}</strong></td>
+                  <td>
+                    <strong>{c.nombre} {c.apellido}</strong>
+                    {c.cantidad_postulaciones > 1 && (
+                      <span className="badge badge-orange" style={{ marginLeft: '8px', fontSize: '0.75rem', padding: '2px 6px' }}>
+                        Reincidente ({c.cantidad_postulaciones})
+                      </span>
+                    )}
+                  </td>
                   <td>{c.empleo_solicitado || <span className="text-muted">No especificado</span>}</td>
                   <td>
                     <span className={`badge ${getBadgeClass(c.estado_actual)}`}>
@@ -246,12 +280,24 @@ const CandidatosPage = () => {
                       ? new Date(c.created_at).toLocaleDateString('es-VE')
                       : '-'}
                   </td>
-                  <td>
+                  <td className="cand-actions-cell">
                     <button
                       className="btn-action"
                       onClick={() => navigate(`/dashboard/expediente/${c.cedula}`)}
                     >
                       Ver expediente <FiArrowRight size={12} />
+                    </button>
+                    <button
+                      className="btn-action-icon"
+                      onClick={() => handleDescargarFicha(c.cedula, c.nombre, c.apellido)}
+                      disabled={descargandoCedula === c.cedula}
+                      title="Descargar Ficha Técnica / Solicitud en PDF"
+                    >
+                      {descargandoCedula === c.cedula ? (
+                        <FiLoader className="spin-icon" size={13} />
+                      ) : (
+                        <FiDownload size={13} />
+                      )}
                     </button>
                   </td>
                 </tr>

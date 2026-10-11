@@ -218,7 +218,7 @@ const ExamenesPage = () => {
         <div>
           <h1 className="exam-titulo">Banco de Preguntas Técnicas</h1>
           <p className="exam-subtitulo">
-            {preguntas.length} pregunta{preguntas.length !== 1 ? 's' : ''} registrada{preguntas.length !== 1 ? 's' : ''} — Sistema SICS
+            {preguntas.length} pregunta{preguntas.length !== 1 ? 's' : ''} registrada{preguntas.length !== 1 ? 's' : ''}
           </p>
         </div>
         <button className="btn-primary btn-nueva-pregunta" onClick={abrirModalCrear}>

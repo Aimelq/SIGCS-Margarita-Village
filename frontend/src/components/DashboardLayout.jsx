@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiUser, FiChevronRight, FiClipboard
+  FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiUser, FiChevronRight, FiClipboard, FiBarChart2
 } from 'react-icons/fi';
 import './DashboardLayout.css';
 
@@ -21,8 +21,7 @@ const ROUTE_TITLES = {
   '/dashboard': 'Panel principal',
   '/dashboard/candidatos': 'Candidatos',
   '/dashboard/examenes': 'Banco de preguntas',
-  '/dashboard/evaluaciones': 'Evaluaciones',
-  '/dashboard/reportes': 'Reportes & KPIs',
+  '/dashboard/reportes': 'Reportes & Analítica',
 };
 
 const DashboardLayout = () => {
@@ -83,7 +82,7 @@ const DashboardLayout = () => {
         <div className="sidebar-header">
           <img src="/Margarita-Village-logo.png" alt="Logo Hotel Margarita Village" className="sidebar-logo" />
           <div>
-            <h3>SICS</h3>
+            <h3>Panel RRHH</h3>
             <span className="sidebar-sub">Margarita Village</span>
           </div>
         </div>
@@ -122,7 +121,18 @@ const DashboardLayout = () => {
             <FiClipboard className="nav-icon" size={16} />
             <span>Banco de preguntas</span>
           </NavLink>
+
+          {/* Enlace a Reportes & Analítica de Talento */}
+          <NavLink
+            to="/dashboard/reportes"
+            onClick={cerrarMenu}
+            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+          >
+            <FiBarChart2 className="nav-icon" size={16} />
+            <span>Reportes & Analítica</span>
+          </NavLink>
         </nav>
+
 
         {/* Pie de la barra lateral con ficha del reclutador y botón de cierre de sesión */}
         <div className="sidebar-footer">

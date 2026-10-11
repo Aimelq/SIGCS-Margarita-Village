@@ -1,0 +1,498 @@
+/* ============================================================
+   REPORTES & ANALÍTICA PAGE (ReportesPage.css)
+   Sistema SICS - Hotel Margarita Village
+============================================================ */
+
+.reportes-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ── CABECERA ── */
+.rep-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.rep-titulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--azul);
+  margin: 0 0 4px 0;
+}
+
+.rep-subtitulo {
+  font-size: 13px;
+  color: var(--texto-mut);
+  margin: 0;
+}
+
+.rep-header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── SELECTOR DE PERÍODO ── */
+.rep-periodo-tabs {
+  display: flex;
+  gap: 6px;
+  background: #f1f5f9;
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  border: 1px solid var(--borde);
+}
+
+.rep-tab {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  border-radius: calc(var(--radius-lg) - 4px);
+  cursor: pointer;
+  color: var(--texto-mut);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.rep-tab.active {
+  background: var(--azul);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(30,58,95,0.25);
+}
+.rep-tab:hover:not(.active) {
+  background: rgba(30,58,95,0.08);
+  color: var(--azul);
+}
+
+/* ── GRID DE KPIS PRINCIPALES ── */
+.rep-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.rep-kpi-card {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--sombra-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.rep-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-md);
+}
+.rep-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--kpi-color, var(--azul));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.rep-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--kpi-bg, #eff6ff);
+  color: var(--kpi-color, var(--azul));
+  flex-shrink: 0;
+}
+
+.rep-kpi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rep-kpi-label {
+  font-size: 12px;
+  color: var(--texto-mut);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.rep-kpi-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--azul);
+  line-height: 1;
+}
+
+.rep-kpi-sub {
+  font-size: 11px;
+  color: var(--texto-mut);
+  margin-top: 2px;
+}
+
+/* ── SECCIÓN 2 COLUMNAS ── */
+.rep-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.rep-grid-3-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* ── CARD GENÉRICA ── */
+.rep-card {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--sombra-sm);
+}
+
+.rep-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.rep-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--azul);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── EMBUDO DE CONVERSIÓN ── */
+.rep-funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rep-funnel-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rep-funnel-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--texto-mut);
+}
+
+.rep-funnel-label {
+  font-weight: 600;
+  color: var(--texto);
+  font-size: 12.5px;
+}
+
+.rep-funnel-bar-wrap {
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rep-funnel-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 4px;
+}
+
+/* ── TABLA DE CARGOS ── */
+.rep-cargo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.rep-cargo-row:last-child {
+  border-bottom: none;
+}
+
+.rep-cargo-rank {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto-mut);
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.rep-cargo-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rep-cargo-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rep-cargo-bar-wrap {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.rep-cargo-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--azul), #3b82f6);
+  border-radius: 999px;
+  transition: width 0.8s ease;
+  min-width: 4px;
+}
+
+.rep-cargo-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--azul);
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rep-cargo-pct {
+  font-size: 11px;
+  color: var(--texto-mut);
+  width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── FORMACIÓN ACADÉMICA ── */
+.rep-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.rep-form-row:last-child { border-bottom: none; }
+
+.rep-form-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rep-form-label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--texto);
+  font-weight: 500;
+}
+
+.rep-form-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--azul);
+  min-width: 28px;
+  text-align: right;
+}
+
+.rep-form-pct {
+  font-size: 11.5px;
+  color: var(--texto-mut);
+  min-width: 38px;
+  text-align: right;
+}
+
+/* ── STAT BLOCKS (PRUEBAS) ── */
+.rep-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.rep-stat-item {
+  background: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.rep-stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--azul);
+  line-height: 1.1;
+}
+
+.rep-stat-label {
+  font-size: 11px;
+  color: var(--texto-mut);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ── EVOLUCIÓN MENSUAL (BARRAS SIMPLES) ── */
+.rep-evol-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 100px;
+  padding: 0 4px;
+}
+
+.rep-evol-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.rep-evol-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #3b82f6, var(--azul));
+  border-radius: 4px 4px 0 0;
+  transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 4px;
+  max-height: 90px;
+}
+
+.rep-evol-val {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.rep-evol-mes {
+  font-size: 9px;
+  color: var(--texto-mut);
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── DISPONIBILIDAD HORARIA ── */
+.rep-disp-grid {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.rep-disp-item {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rep-disp-pct {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--azul);
+}
+
+.rep-disp-label {
+  font-size: 12px;
+  color: var(--texto-mut);
+  font-weight: 500;
+}
+
+/* ── CARGANDO / VACÍO ── */
+.rep-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 12px;
+  color: var(--texto-mut);
+  font-size: 14px;
+}
+
+.rep-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── BOTÓN DESCARGAR REPORTE ── */
+.btn-rep-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1.2rem;
+  background: var(--azul);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(30,58,95,0.2);
+}
+.btn-rep-pdf:hover:not(:disabled) {
+  background: #1e3a5f;
+  box-shadow: 0 4px 12px rgba(30,58,95,0.3);
+  transform: translateY(-1px);
+}
+.btn-rep-pdf:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .rep-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .rep-grid-2, .rep-grid-3-1 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .rep-kpi-grid { grid-template-columns: 1fr 1fr; }
+  .rep-kpi-value { font-size: 1.6rem; }
+  .rep-header { flex-direction: column; align-items: flex-start; }
+  .rep-periodo-tabs { flex-wrap: wrap; }
+  .rep-stat-grid { grid-template-columns: 1fr 1fr; }
+  .rep-disp-grid { flex-direction: column; }
+}

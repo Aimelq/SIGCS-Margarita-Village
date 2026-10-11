@@ -213,7 +213,7 @@ function LandingPage() {
           </div>
           <div className="footer-copy">
             <p>© 2026 Hotel Margarita Village. Todos los derechos reservados.</p>
-            <p>Sistema SICS — Desarrollado como Trabajo de Grado, UDO Nueva Esparta.</p>
+            {/* Eliminado texto de tesis */}
           </div>
         </div>
       </footer>

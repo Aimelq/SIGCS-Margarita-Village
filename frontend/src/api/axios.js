@@ -12,8 +12,11 @@ import axios from 'axios'
 
 // Creación de la instancia global de Axios
 const api = axios.create({
-  baseURL: 'http://localhost:5000',
-  headers: { 'Content-Type': 'application/json' }
+  baseURL: '', // Utiliza rutas relativas para apoyarse en el proxy de Vite (un solo túnel)
+  headers: { 
+    'Content-Type': 'application/json',
+    'Bypass-Tunnel-Reminder': 'true'
+  }
 })
 
 // ------------------------------------------------------------

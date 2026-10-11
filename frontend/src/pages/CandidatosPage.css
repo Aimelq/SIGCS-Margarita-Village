@@ -161,7 +161,13 @@
   border: 1px solid var(--borde);
   border-radius: var(--radius-lg);
   box-shadow: var(--sombra-sm);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.cand-table-wrap .data-table {
+  min-width: 680px;
 }
 
 .cand-cedula {
@@ -220,4 +226,86 @@
 .cand-pag-info {
   font-size: 13px;
   color: var(--texto-mut);
+}
+
+@media (max-width: 768px) {
+  .cand-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .cand-titulo {
+    font-size: 1.3rem;
+  }
+  .cand-filtros {
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .cand-search-box,
+  .cand-filter-box {
+    min-width: 100%;
+    width: 100%;
+  }
+  .cand-date-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cand-date-box {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .cand-date-box input[type="date"] {
+    flex: 1;
+    text-align: right;
+  }
+  .cand-reset-btn {
+    width: 100%;
+    text-align: center;
+  }
+  .cand-loading,
+  .cand-empty {
+    padding: 2rem 1rem;
+  }
+}
+
+/* ── ACCIONES DE TABLA ── */
+.cand-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--texto-mut);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-action-icon:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: var(--azul);
+  color: var(--azul);
+}
+.btn-action-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

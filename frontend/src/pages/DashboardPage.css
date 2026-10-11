@@ -141,27 +141,33 @@
 /* ── MÉTRICAS ── */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
 }
 
-@media (max-width: 1100px) {
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1400px) {
+  .metrics-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 600px) {
+@media (max-width: 860px) {
+  .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
   .metrics-grid { grid-template-columns: 1fr; }
 }
 
 .metric-card {
   background: #fff;
   border-radius: var(--radius-lg);
-  padding: 20px 22px;
+  padding: 16px 14px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   border: 1px solid var(--borde);
   box-shadow: var(--sombra-sm);
   transition: box-shadow 0.2s, transform 0.2s;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .metric-card:hover {
   box-shadow: var(--sombra-md);
@@ -169,32 +175,49 @@
 }
 
 .metric-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
+  font-size: 18px;
   flex-shrink: 0;
 }
 
+.metric-info {
+  min-width: 0;
+  flex: 1;
+}
+
 .metric-info h3 {
-  margin: 0 0 3px 0;
-  font-size: 12px;
+  margin: 0 0 4px 0;
+  font-size: 11px;
   color: var(--texto-mut);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
+  line-height: 1.2;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .metric-value {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.55rem;
   font-weight: 800;
   color: var(--azul);
-  line-height: 1;
-  letter-spacing: -0.03em;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.metric-sub {
+  display: block;
+  font-size: 10.5px;
+  color: var(--texto-mut);
+  margin-top: 3px;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 /* Icon backgrounds */
@@ -202,6 +225,29 @@
 .bg-orange-100 { background: #ffedd5; color: #c2410c; }
 .bg-yellow-100 { background: #fef3c7; color: #b45309; }
 .bg-green-100  { background: #dcfce7; color: #15803d; }
+.bg-teal-100   { background: #ccfbf1; color: #0d9488; }
+.bg-purple-100 { background: #ede9fe; color: #7c3aed; }
+
+/* ── ACCESO RÁPIDO A ANALÍTICA ── */
+.dash-quick-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-lg);
+  padding: 12px 20px;
+  gap: 12px;
+}
+
+.dash-quick-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--azul);
+}
 
 /* ── SECCIÓN TABLA RECIENTES ── */
 .recent-section {
@@ -210,6 +256,16 @@
   border: 1px solid var(--borde);
   box-shadow: var(--sombra-sm);
   overflow: hidden;
+}
+
+.recent-section .table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.recent-section .data-table {
+  min-width: 650px;
 }
 
 .section-header {
@@ -257,3 +313,60 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    gap: 16px;
+  }
+  .dash-header-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .search-section {
+    max-width: 100%;
+  }
+  .dash-welcome h1 {
+    font-size: 1.3rem;
+  }
+  .section-header {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-header h2 {
+    font-size: 14px;
+  }
+  .metric-card {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .metric-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+  }
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .metric-card {
+    padding: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .metric-info h3 {
+    font-size: 10px;
+  }
+  .metric-value {
+    font-size: 1.35rem;
+  }
+}
+

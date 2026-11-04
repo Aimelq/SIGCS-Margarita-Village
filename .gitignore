@@ -1,0 +1,36 @@
+# ============================================================
+# .gitignore - SIGCS Margarita Village
+# Archivos que NO deben subirse a GitHub
+# ============================================================
+
+# Variables de entorno (contienen contraseñas y secretos)
+.env
+.env.local
+.env.production
+
+# Archivos subidos por los usuarios (CVs, documentos)
+backend/uploads/
+
+# Dependencias de Python
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+*.pyo
+
+# Dependencias de Node.js
+frontend/node_modules/
+
+# Build del frontend (se genera en Render, no necesita subirse)
+frontend/dist/
+
+# Scripts de parcheo temporal usados durante el desarrollo
+backend/fix.py
+backend/patch*.py
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

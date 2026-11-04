@@ -1,0 +1,47 @@
+# ============================================================
+# render.yaml - Configuración de despliegue para Render.com
+# SIGCS - Hotel Margarita Village
+#
+# Este archivo le dice a Render cómo desplegar todos los servicios.
+# Docs: https://render.com/docs/blueprint-spec
+# ============================================================
+
+services:
+  # ----------------------------------------------------------
+  # BACKEND: API Flask
+  # ----------------------------------------------------------
+  - type: web
+    name: sigcs-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sigcs-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true  # Render genera un valor aleatorio seguro automáticamente
+
+  # ----------------------------------------------------------
+  # FRONTEND: React / Vite (Static Site)
+  # ----------------------------------------------------------
+  - type: web
+    name: sigcs-frontend
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    rootDir: ./frontend
+    envVars:
+      - key: VITE_API_URL
+        # Reemplaza esto con la URL real de tu backend en Render
+        # ej: https://sigcs-backend.onrender.com
+        value: ""
+
+# ----------------------------------------------------------
+# BASE DE DATOS: PostgreSQL gestionada por Render
+# ----------------------------------------------------------
+databases:
+  - name: sigcs-db
+    databaseName: sigcs_mv
+    user: admin

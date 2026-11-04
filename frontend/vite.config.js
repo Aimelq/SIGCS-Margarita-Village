@@ -14,11 +14,18 @@ export default defineConfig({
       interval: 1000,
     },
     proxy: {
+      // En desarrollo local, redirige /api al backend de Docker
       '/api': {
         target: 'http://backend:5000',
         changeOrigin: true,
       }
     }
   },
+  build: {
+    // Carpeta de salida del build de producción
+    outDir: 'dist',
+    // Muestra advertencias si un chunk supera 1MB
+    chunkSizeWarningLimit: 1000,
+  }
 })
 

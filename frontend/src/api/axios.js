@@ -2,17 +2,19 @@
 // CONFIGURACIÓN DEL CLIENTE HTTP (AXIOS)
 // Sistema SICS - Hotel Margarita Village
 //
-// Este archivo crea y exporta una instancia personalizada de Axios.
-// Configura la URL base del servidor backend y define interceptores
-// automáticos para el envío de tokens de seguridad y la gestión
-// centralizada de errores de autenticación.
+// En desarrollo: usa rutas relativas, el proxy de Vite redirige /api → backend:5000
+// En producción (Render): usa VITE_API_URL para apuntar al backend desplegado
 // ============================================================
 
 import axios from 'axios'
 
+// En producción, VITE_API_URL tendrá la URL del backend en Render.
+// En local, queda vacío y el proxy de Vite se encarga.
+const baseURL = import.meta.env.VITE_API_URL || ''
+
 // Creación de la instancia global de Axios
 const api = axios.create({
-  baseURL: '', // Utiliza rutas relativas para apoyarse en el proxy de Vite (un solo túnel)
+  baseURL,
   headers: { 
     'Content-Type': 'application/json',
     'Bypass-Tunnel-Reminder': 'true'

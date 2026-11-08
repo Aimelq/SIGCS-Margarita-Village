@@ -67,6 +67,10 @@ const ExamenesPage = () => {
   // Mensaje de error de la operación de eliminación
   const [errorEliminar, setErrorEliminar] = useState('')
 
+  // Paginación — cuántos reactivos mostrar por página
+  const ITEMS_POR_PAGINA = 10
+  const [paginaActual, setPaginaActual] = useState(1)
+
   // -------------------------------------------------------
   // CARGA DE PREGUNTAS DESDE LA API
   // -------------------------------------------------------

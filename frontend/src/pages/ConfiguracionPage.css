@@ -1,0 +1,202 @@
+/* ============================================================
+   CONFIGURACION PAGE STYLES
+============================================================ */
+
+.config-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.config-header {
+  margin-bottom: 6px;
+}
+
+.config-titulo {
+  font-size: 1.5rem;
+  color: var(--azul);
+  margin: 0 0 6px 0;
+  font-weight: 700;
+}
+
+.config-sub {
+  margin: 0;
+  color: var(--texto-mut);
+  font-size: 14px;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 850px) {
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.config-card {
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--sombra-sm);
+}
+
+.card-header-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.card-header-icon h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--azul);
+}
+
+.card-desc {
+  margin: 0 0 20px 0;
+  font-size: 13px;
+  color: var(--texto-mut);
+}
+
+/* ── PROFILE META ── */
+.user-profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.profile-avatar-large {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--azul);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  color: var(--texto);
+  font-weight: 700;
+}
+
+.profile-rol-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.profile-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-mut);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-value {
+  font-size: 13.5px;
+  color: var(--texto);
+}
+
+/* ── FORM PASSWORD ── */
+.form-password {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--texto-mut);
+  pointer-events: none;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+  color: var(--texto);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input-with-icon input:focus {
+  border-color: var(--azul);
+}
+
+.btn-guardar-password {
+  margin-top: 6px;
+  background: var(--azul);
+  color: #fff;
+  border: none;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-guardar-password:hover {
+  background: #1e3a8a;
+}
+
+.btn-guardar-password:active {
+  transform: scale(0.98);
+}
+
+.config-spin {
+  animation: spin 0.8s linear infinite;
+}

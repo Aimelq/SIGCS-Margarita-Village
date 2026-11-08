@@ -34,6 +34,16 @@ class EvaluacionesRepository:
         finally:
             conn.close()
 
+    def get_user_name(self, usuario_id):
+        conn = get_db()
+        try:
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cur.execute("SELECT TRIM(CONCAT(nombre, ' ', COALESCE(apellido, ''))) AS nombre_completo FROM usuarios WHERE id = %s", (usuario_id,))
+            res = cur.fetchone()
+            return res["nombre_completo"] if res and res["nombre_completo"] else "Reclutador"
+        finally:
+            conn.close()
+
     def save_evaluacion(self, aspirante_id, usuario_id, elegible_count, no_elegible_count, veredicto, justificacion, notas_generales, criterios_evaluados, nuevo_estado):
         conn = get_db()
         try:
@@ -112,7 +122,7 @@ class EvaluacionesRepository:
                 SELECT
                     e.id, e.veredicto, e.elegible_count, e.no_elegible_count,
                     e.justificacion_automatizada, e.notas, e.created_at,
-                    u.nombre as entrevistador
+                    TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido, ''))) as entrevistador
                 FROM evaluaciones e
                 JOIN aspirantes a ON a.id = e.aspirante_id
                 JOIN usuarios u ON u.id = e.user_id

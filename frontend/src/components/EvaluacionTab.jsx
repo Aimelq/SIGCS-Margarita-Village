@@ -13,10 +13,12 @@ import {
   FiCheckCircle, FiXCircle, FiClipboard, FiLoader,
   FiAlertTriangle, FiRotateCcw, FiSave, FiUser, FiCalendar
 } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import './EvaluacionTab.css';
 
 const EvaluacionTab = ({ cedula }) => {
+  const { usuario } = useAuth();
   // Catálogo de criterios recuperados desde la base de datos
   const [criterios, setCriterios] = useState([]);
   
@@ -167,6 +169,10 @@ const EvaluacionTab = ({ cedula }) => {
             </div>
           </div>
           <p className="veredicto-justificacion">{resultado.justificacion}</p>
+          <div className="veredicto-evaluador-info">
+            <FiUser size={13} />
+            <span>Evaluado por: <strong>{resultado.evaluador || usuario?.nombre || 'Usuario actual'}</strong></span>
+          </div>
           <p className="veredicto-estado-label">
             Estado actualizado a: <strong>{resultado.estado_candidato}</strong>
           </p>
@@ -329,7 +335,9 @@ const EvaluacionTab = ({ cedula }) => {
                   <span className="historial-veredicto-text">{ev.veredicto}</span>
                 </div>
                 <div className="historial-meta">
-                  <span><FiUser size={11} /> {ev.entrevistador}</span>
+                  <span className="historial-evaluador-pill">
+                    <FiUser size={12} /> Evaluado por: <strong>{ev.entrevistador || 'No registrado'}</strong>
+                  </span>
                   <span><FiCalendar size={11} /> {formatearFecha(ev.created_at)}</span>
                 </div>
               </div>

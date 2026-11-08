@@ -418,6 +418,37 @@
   color: var(--texto-mut);
 }
 
+.veredicto-evaluador-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--azul);
+  background: rgba(15, 23, 42, 0.05);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.veredicto-evaluador-info strong {
+  color: var(--texto);
+}
+
+.historial-evaluador-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-main);
+  border: 1px solid var(--borde);
+  padding: 3px 8px;
+  border-radius: 20px;
+  color: var(--texto);
+  font-size: 11px;
+}
+.historial-evaluador-pill strong {
+  color: var(--azul);
+}
+
 .btn-nueva-eval {
   align-self: flex-start;
   display: flex;

@@ -5,10 +5,12 @@
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-main);
+  position: relative;
 }
 
-/* ── SIDEBAR ── */
+/* ── SIDEBAR (Drawer en móvil / Barra lateral en escritorio) ── */
 .sidebar {
   width: 240px;
   background: var(--azul);
@@ -17,20 +19,30 @@
   flex-direction: column;
   position: fixed;
   height: 100vh;
+  height: 100dvh; /* Usa dynamic viewport height para evitar desbordes con barras del navegador móvil */
   left: 0;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   border-right: 1px solid rgba(255,255,255,0.08);
+  box-sizing: border-box;
 }
 
 /* ── SIDEBAR HEADER ── */
 .sidebar-header {
-  padding: 20px 20px 16px;
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Distribuye marca a la izquierda y botón ✕ a la derecha */
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0; /* Nunca se colapsa */
+}
+
+.sidebar-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  min-width: 0;
 }
 
 .sidebar-logo {
@@ -43,31 +55,59 @@
   flex-shrink: 0;
 }
 
-.sidebar-header h3 {
+.sidebar-brand-text h3 {
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255,255,255,0.95);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0 0 1px 0;
+  line-height: 1.2;
 }
 
 .sidebar-sub {
   font-size: 10px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.5);
   font-weight: 500;
   letter-spacing: 0.04em;
+  display: block;
+}
+
+/* Botón ✕ para cerrar el menú lateral (oculto en escritorio) */
+.sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-close-btn:active {
+  transform: scale(0.92);
 }
 
 /* ── SIDEBAR NAV ── */
 .sidebar-nav {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0; /* CRUCIAL: Permite que solo esta área haga scroll interno si no cabe en pantalla */
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 3px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sidebar-section-label {
@@ -124,13 +164,15 @@
 
 .nav-item.active .nav-icon { opacity: 1; }
 
-/* ── SIDEBAR FOOTER ── */
+/* ── SIDEBAR FOOTER (Siempre anclado al final y con padding para gestos del móvil) ── */
 .sidebar-footer {
-  padding: 12px;
+  flex-shrink: 0; /* Nunca se comprime ni se oculta */
+  padding: 12px 12px max(16px, env(safe-area-inset-bottom, 16px));
   border-top: 1px solid rgba(255,255,255,0.1);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  background: var(--azul);
 }
 
 /* Info del usuario al pie */
@@ -138,16 +180,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 10px 6px;
+  padding: 8px 10px;
 }
 
 .sidebar-avatar {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   border-radius: 50%;
   background: rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,7 +205,7 @@
 .sidebar-user-name {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -171,7 +213,7 @@
 
 .sidebar-user-role {
   font-size: 11px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.45);
   text-transform: capitalize;
 }
 
@@ -182,11 +224,11 @@
   gap: 10px;
   padding: 10px 12px;
   background: transparent;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.65);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   font-family: 'Inter', sans-serif;
   text-align: left;
@@ -205,9 +247,12 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
+  /* overflow-x: clip no rompe position: sticky como lo hace overflow-x: hidden */
+  overflow-x: clip;
 }
 
-/* ── TOPBAR ── */
+/* ── TOPBAR (Fija en la parte superior siempre con sticky) ── */
 .dashboard-header {
   height: 60px;
   background: #fff;
@@ -218,15 +263,45 @@
   padding: 0 28px;
   position: sticky;
   top: 0;
-  z-index: 90;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
 
-.header-title { }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Botón ☰ que vive DENTRO del header en móviles (nunca flota aislado) */
+.header-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--azul);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.header-menu-btn:active {
+  transform: scale(0.93);
+}
 
 .header-breadcrumb {
-  font-size: 13px;
-  color: var(--texto-mut);
-  font-weight: 500;
+  font-size: 14px;
+  color: var(--texto);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-user {
@@ -234,6 +309,7 @@
   align-items: center;
   gap: 10px;
   cursor: default;
+  flex-shrink: 0;
 }
 
 .user-name {
@@ -276,78 +352,78 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-/* ── MOBILE MENU ── */
-.mobile-menu-btn {
-  display: none;
-  position: fixed;
-  top: 14px;
-  left: 16px;
-  z-index: 110;
-  background: var(--azul);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  width: 38px;
-  height: 38px;
-  cursor: pointer;
-  box-shadow: var(--sombra-md);
-  align-items: center;
-  justify-content: center;
-}
-
 .sidebar-overlay { display: none; }
 
+/* ── RESPONSIVE: TABLETS Y MÓVILES (<= 992px) ── */
 @media (max-width: 992px) {
   .sidebar { 
     transform: translateX(-100%); 
-    width: 260px;
+    width: 270px;
     max-width: 82vw;
-    z-index: 1000;
+    z-index: 1100;
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
   }
   .sidebar.abierto { transform: translateX(0); }
-  .dashboard-main { margin-left: 0; min-width: 0; overflow-x: hidden; width: 100%; }
-  .mobile-menu-btn { display: flex; z-index: 1001; }
+  
+  .sidebar-close-btn {
+    display: flex; /* Botón ✕ visible en el header del menú */
+  }
+
+  .dashboard-main { 
+    margin-left: 0; 
+    width: 100%; 
+  }
   
   .dashboard-header { 
-    padding: 0 16px 0 64px; 
-    z-index: 90;
+    padding: 0 16px;
+    height: 58px;
+  }
+  
+  .header-menu-btn { 
+    display: flex; /* Botón ☰ visible e integrado dentro de la barra superior */
   }
   
   .dashboard-content { 
     padding: 16px; 
-    min-width: 0;
-    overflow-x: hidden;
     width: 100%;
+    box-sizing: border-box;
   }
 
   .sidebar-overlay {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(15,23,42,0.6);
+    background: rgba(15,23,42,0.65);
     backdrop-filter: blur(4px);
-    z-index: 999;
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1050;
     animation: fadeIn 0.25s ease;
   }
 }
 
+/* ── RESPONSIVE: MÓVILES PEQUEÑOS (<= 576px) ── */
 @media (max-width: 576px) {
   .dashboard-header { 
-    padding: 0 12px 0 58px;
+    padding: 0 12px;
     height: 54px;
   }
   
+  .header-left {
+    gap: 10px;
+  }
+
+  .header-menu-btn {
+    width: 36px;
+    height: 36px;
+  }
+
   .dashboard-content {
     padding: 12px;
   }
   
   .header-breadcrumb {
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-    display: block;
+    font-size: 13px;
+    max-width: 140px;
   }
   
   .user-role {
@@ -356,6 +432,12 @@
   
   .user-name {
     font-size: 12px;
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
   }
 }
 

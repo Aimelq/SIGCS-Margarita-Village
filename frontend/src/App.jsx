@@ -32,6 +32,10 @@ import ExamenCandidatoPage from './pages/ExamenCandidatoPage'
 // Módulo Sprint 9: Reportes Ejecutivos & Analítica de Selección
 import ReportesPage from './pages/ReportesPage'
 
+// Nuevos módulos: Gestión de Usuarios (Admin) y Configuración (Todos)
+import UsuariosPage from './pages/UsuariosPage'
+import ConfiguracionPage from './pages/ConfiguracionPage'
+
 import './index.css'
 import './App.css'
 
@@ -80,6 +84,12 @@ function App() {
 
               {/* Módulo de Reportes Ejecutivos y Analítica — Sprint 9 */}
               <Route path="/dashboard/reportes" element={<ReportesPage />} />
+
+              {/* Módulo exclusivo de Administrador: Gestión de Usuarios */}
+              <Route path="/dashboard/usuarios" element={<UsuariosPage />} />
+
+              {/* Módulo general para todos los roles: Configuración y cambio de clave */}
+              <Route path="/dashboard/configuracion" element={<ConfiguracionPage />} />
             </Route>
             
           </Route>

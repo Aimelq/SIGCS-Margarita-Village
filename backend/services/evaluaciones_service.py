@@ -167,13 +167,16 @@ class EvaluacionesService:
             veredicto, justificacion, notas_generales, criterios_evaluados, nuevo_estado
         )
 
+        evaluador_nombre = self.repository.get_user_name(usuario_id)
+
         return {
             "evaluacion_id": evaluacion_id,
             "veredicto": veredicto,
             "elegible_count": elegible_count,
             "no_elegible_count": no_elegible_count,
             "justificacion": justificacion,
-            "estado_candidato": nuevo_estado
+            "estado_candidato": nuevo_estado,
+            "evaluador": evaluador_nombre
         }
 
     def obtener_evaluaciones(self, cedula):

@@ -83,9 +83,12 @@ CREATE TABLE postulaciones (
 CREATE TABLE usuarios (
   id SERIAL PRIMARY KEY,                          -- Identificador único del usuario
   email VARCHAR(180) NOT NULL UNIQUE,             -- Correo institucional (utilizado como nombre de usuario)
-  nombre VARCHAR(150) NOT NULL,                   -- Nombre completo del reclutador o administrador
+  nombre VARCHAR(150) NOT NULL,                   -- Nombres del reclutador o administrador
+  apellido VARCHAR(150) DEFAULT '',               -- Apellidos del usuario
+  cedula VARCHAR(20) UNIQUE,                      -- Cédula de identidad del usuario
   password_hash VARCHAR(255) NOT NULL,            -- Hash seguro de la contraseña (encriptado con Bcrypt)
   rol VARCHAR(40) NOT NULL DEFAULT 'reclutador',   -- Perfil de acceso (reclutador, administrador)
+  activo BOOLEAN NOT NULL DEFAULT TRUE,           -- Estado de cuenta (true: habilitado, false: suspendido)
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación de la cuenta
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  -- Fecha de última actualización de la cuenta
 );

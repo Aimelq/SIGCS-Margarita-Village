@@ -33,6 +33,7 @@ from routes.aspirantes_routes import aspirantes_bp
 from routes.evaluaciones_routes import evaluaciones_bp
 from routes.preguntas_routes import preguntas_bp
 from routes.examenes_routes import examenes_bp
+from routes.usuarios_routes import usuarios_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
@@ -41,6 +42,7 @@ app.register_blueprint(aspirantes_bp)
 app.register_blueprint(evaluaciones_bp)
 app.register_blueprint(preguntas_bp)
 app.register_blueprint(examenes_bp)
+app.register_blueprint(usuarios_bp)
 
 # ------------------------------------------------------------
 # PUNTO DE ARRANQUE DEL SERVIDOR DE DESARROLLO

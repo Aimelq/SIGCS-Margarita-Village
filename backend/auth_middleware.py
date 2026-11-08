@@ -30,3 +30,20 @@ def requiere_token(f):
         
         return f(*args, **kwargs)
     return decorador
+
+
+def requiere_admin(f):
+    """
+    Decorador para proteger rutas exclusivas de rol administrador.
+    Verifica que el token pertenezca a un usuario con rol 'administrador'.
+    """
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return f(*args, **kwargs)
+        if not hasattr(request, "usuario") or not request.usuario:
+            return jsonify({"error": "No autenticado"}), 401
+        if request.usuario.get("rol") != "administrador":
+            return jsonify({"error": "Acceso restringido: Se requieren permisos de Administrador"}), 403
+        return f(*args, **kwargs)
+    return decorador

@@ -12,7 +12,8 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiUser, FiChevronRight, FiClipboard, FiBarChart2
+  FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiUser, FiChevronRight,
+  FiClipboard, FiBarChart2, FiSettings, FiUserCheck
 } from 'react-icons/fi';
 import './DashboardLayout.css';
 
@@ -22,6 +23,8 @@ const ROUTE_TITLES = {
   '/dashboard/candidatos': 'Candidatos',
   '/dashboard/examenes': 'Banco de preguntas',
   '/dashboard/reportes': 'Reportes & Analítica',
+  '/dashboard/usuarios': 'Gestión de usuarios',
+  '/dashboard/configuracion': 'Configuración de cuenta',
 };
 
 const DashboardLayout = () => {
@@ -66,25 +69,25 @@ const DashboardLayout = () => {
   return (
     <div className="dashboard-layout">
 
-      {/* Botón flotante para alternar menú en pantallas móviles */}
-      <button
-        className="mobile-menu-btn"
-        onClick={() => setMenuAbierto(!menuAbierto)}
-        aria-label="Abrir menú"
-      >
-        {menuAbierto ? <FiX size={20} /> : <FiMenu size={20} />}
-      </button>
-
       {/* Barra lateral de navegación principal (Sidebar) */}
       <aside className={`sidebar ${menuAbierto ? 'abierto' : ''}`}>
 
-        {/* Encabezado del menú lateral con isotipo y acrónimo del sistema */}
+        {/* Encabezado del menú lateral con isotipo, acrónimo del sistema y botón de cerrar en móviles */}
         <div className="sidebar-header">
-          <img src="/Margarita-Village-logo.png" alt="Logo Hotel Margarita Village" className="sidebar-logo" />
-          <div>
-            <h3>Panel RRHH</h3>
-            <span className="sidebar-sub">Margarita Village</span>
+          <div className="sidebar-brand">
+            <img src="/Margarita-Village-logo.png" alt="Logo Hotel Margarita Village" className="sidebar-logo" />
+            <div className="sidebar-brand-text">
+              <h3>Panel RRHH</h3>
+              <span className="sidebar-sub">Margarita Village</span>
+            </div>
           </div>
+          <button
+            className="sidebar-close-btn"
+            onClick={() => setMenuAbierto(false)}
+            aria-label="Cerrar menú"
+          >
+            <FiX size={18} />
+          </button>
         </div>
 
         {/* Enlaces de navegación interna */}
@@ -131,6 +134,28 @@ const DashboardLayout = () => {
             <FiBarChart2 className="nav-icon" size={16} />
             <span>Reportes & Analítica</span>
           </NavLink>
+
+          {/* Enlace a Gestión de Usuarios (Exclusivo Administradores) */}
+          {usuario?.rol === 'administrador' && (
+            <NavLink
+              to="/dashboard/usuarios"
+              onClick={cerrarMenu}
+              className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+            >
+              <FiUserCheck className="nav-icon" size={16} />
+              <span>Usuarios</span>
+            </NavLink>
+          )}
+
+          {/* Enlace a Configuración de Cuenta (Disponible para todos) */}
+          <NavLink
+            to="/dashboard/configuracion"
+            onClick={cerrarMenu}
+            className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
+          >
+            <FiSettings className="nav-icon" size={16} />
+            <span>Configuración</span>
+          </NavLink>
         </nav>
 
 
@@ -154,10 +179,19 @@ const DashboardLayout = () => {
 
       {/* Área principal del panel de administración */}
       <main className="dashboard-main">
-        {/* Cabecera superior con breadcrumb dinámico e identificador de usuario */}
+        {/* Cabecera superior con botón de apertura en móviles, breadcrumb dinámico e identificador de usuario */}
         <header className="dashboard-header">
-          <div className="header-title">
-            {getBreadcrumb()}
+          <div className="header-left">
+            <button
+              className="header-menu-btn"
+              onClick={() => setMenuAbierto(true)}
+              aria-label="Abrir menú"
+            >
+              <FiMenu size={20} />
+            </button>
+            <div className="header-title">
+              {getBreadcrumb()}
+            </div>
           </div>
           <div className="header-user">
             <div className="user-meta">

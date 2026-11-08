@@ -73,3 +73,30 @@ def cambiar_estado(user_id):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@usuarios_bp.route("/api/usuarios/<int:user_id>/rol", methods=["PATCH", "OPTIONS"])
+@requiere_token
+@requiere_admin
+def cambiar_rol(user_id):
+    """
+    PATCH /api/usuarios/<id>/rol
+    Permite a un administrador modificar el rol de un usuario.
+    """
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    datos = request.get_json() or {}
+    nuevo_rol = datos.get("rol", "")
+    if not nuevo_rol:
+        return jsonify({"error": "El campo 'rol' es requerido ('administrador' o 'reclutador')"}), 400
+
+    solicitante_id = int(request.usuario.get("sub"))
+
+    try:
+        resultado = usuarios_service.cambiar_rol(user_id, nuevo_rol, solicitante_id)
+        return jsonify(resultado), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

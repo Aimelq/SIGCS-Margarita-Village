@@ -97,3 +97,19 @@ class UsuariosRepository:
             raise e
         finally:
             conn.close()
+
+    def update_rol(self, user_id, nuevo_rol):
+        conn = get_db()
+        try:
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE usuarios SET rol = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s",
+                (nuevo_rol, user_id)
+            )
+            conn.commit()
+            return True
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()

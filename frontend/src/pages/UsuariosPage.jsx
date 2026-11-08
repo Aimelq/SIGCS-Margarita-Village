@@ -116,6 +116,29 @@ const UsuariosPage = () => {
     }
   };
 
+  const handleCambiarRol = async (u, nuevoRol) => {
+    if (u.rol === nuevoRol) return;
+
+    const nombreRol = nuevoRol === 'administrador' ? 'Administrador' : 'Reclutador';
+    const confirmacion = window.confirm(
+      `¿Deseas cambiar el rol de ${u.nombre} ${u.apellido} a "${nombreRol}"?\n\n` +
+      (nuevoRol === 'administrador'
+        ? 'Tendrá acceso completo a la gestión de usuarios y métricas del sistema.'
+        : 'Solo tendrá acceso a evaluaciones, entrevistas y expedientes de candidatos.')
+    );
+
+    if (!confirmacion) return;
+
+    try {
+      await api.patch(`/api/usuarios/${u.id}/rol`, { rol: nuevoRol });
+      setUsuarios(prev => prev.map(item => item.id === u.id ? { ...item, rol: nuevoRol } : item));
+      setMensajeExito(`Rol de ${u.nombre} actualizado a "${nombreRol}" exitosamente.`);
+      setTimeout(() => setMensajeExito(null), 3500);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error al cambiar el rol del usuario.');
+    }
+  };
+
   // Contadores para métricas
   const totalUsuarios = usuarios.length;
   const totalAdmins = usuarios.filter(u => u.rol === 'administrador').length;
@@ -246,9 +269,21 @@ const UsuariosPage = () => {
                         <span className="user-email">{u.email}</span>
                       </td>
                       <td>
-                        <span className={`rol-badge ${u.rol === 'administrador' ? 'rol-admin' : 'rol-reclutador'}`}>
-                          {u.rol === 'administrador' ? 'Administrador' : 'Reclutador'}
-                        </span>
+                        {esPropioUsuario ? (
+                          <span className="rol-badge rol-admin" title="No puedes cambiar tu propio rol en sesión">
+                            Administrador (Tú)
+                          </span>
+                        ) : (
+                          <select
+                            className={`select-rol-inline ${u.rol === 'administrador' ? 'sel-admin' : 'sel-reclutador'}`}
+                            value={u.rol}
+                            onChange={(e) => handleCambiarRol(u, e.target.value)}
+                            title="Haz clic para cambiar el rol de este usuario"
+                          >
+                            <option value="reclutador">Reclutador</option>
+                            <option value="administrador">Administrador</option>
+                          </select>
+                        )}
                       </td>
                       <td>
                         <span className={`estado-badge ${u.activo ? 'est-activo' : 'est-inactivo'}`}>

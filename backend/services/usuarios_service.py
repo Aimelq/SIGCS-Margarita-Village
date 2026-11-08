@@ -70,3 +70,25 @@ class UsuariosService:
             "usuario_id": user_id,
             "activo": activo
         }
+
+    def cambiar_rol(self, user_id, nuevo_rol, solicitante_id):
+        user_id = int(user_id)
+        solicitante_id = int(solicitante_id)
+        nuevo_rol = nuevo_rol.strip().lower()
+
+        if nuevo_rol not in ["administrador", "reclutador"]:
+            raise ValueError("El rol debe ser 'administrador' o 'reclutador'")
+
+        if user_id == solicitante_id and nuevo_rol != "administrador":
+            raise ValueError("No puedes degradar tu propia cuenta de Administrador mientras estés en sesión")
+
+        usuario = self.repository.get_user_by_id(user_id)
+        if not usuario:
+            raise ValueError("Usuario no encontrado")
+
+        self.repository.update_rol(user_id, nuevo_rol)
+        return {
+            "mensaje": f"Rol actualizado exitosamente a {nuevo_rol.capitalize()}",
+            "usuario_id": user_id,
+            "rol": nuevo_rol
+        }

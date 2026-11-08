@@ -15,7 +15,7 @@ class ExamenesRepository:
         conn = get_db()
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-            cur.execute("SELECT id FROM preguntas WHERE tipo IN ('Opción múltiple', 'Verdadero/Falso') ORDER BY RANDOM() LIMIT %s", (limit,))
+            cur.execute("SELECT id FROM preguntas WHERE tipo IN ('multiple', 'Opción múltiple', 'Verdadero/Falso') ORDER BY RANDOM() LIMIT %s", (limit,))
             return cur.fetchall()
         finally:
             conn.close()
@@ -24,7 +24,7 @@ class ExamenesRepository:
         conn = get_db()
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-            cur.execute("SELECT id FROM preguntas WHERE tipo = 'Desarrollo abierto' ORDER BY RANDOM() LIMIT %s", (limit,))
+            cur.execute("SELECT id FROM preguntas WHERE tipo IN ('abierta', 'Desarrollo abierto') ORDER BY RANDOM() LIMIT %s", (limit,))
             return cur.fetchall()
         finally:
             conn.close()

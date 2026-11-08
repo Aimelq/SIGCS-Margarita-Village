@@ -17,8 +17,8 @@ class DashboardService:
         return self.repository.get_metrics()
 
     def get_recent_activity(self):
-        """Obtiene las 10 postulaciones más recientes para la tabla rápida."""
-        return self.repository.get_recent_applications(limit=10)
+        """Obtiene las 5 postulaciones más recientes para la tabla rápida."""
+        return self.repository.get_recent_applications(limit=5)
 
     def get_analytics(self, periodo="todo"):
         """

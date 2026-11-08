@@ -135,6 +135,11 @@ const EvaluacionTab = ({ cedula }) => {
   const elegiblesCount = Object.values(decisiones).filter(d => d.decision === 'elegible').length;
   const noElegiblesCount = Object.values(decisiones).filter(d => d.decision === 'no_elegible').length;
 
+  // Filtra para que la evaluación recién finalizada no se muestre duplicada abajo
+  const evaluacionesPrevias = resultado
+    ? evaluacionesAnteriores.filter(ev => ev.id !== resultado.evaluacion_id)
+    : evaluacionesAnteriores;
+
   if (cargandoCriterios) {
     return (
       <div className="eval-loading">
@@ -318,13 +323,13 @@ const EvaluacionTab = ({ cedula }) => {
         </div>
       )}
 
-      {/* ── HISTORIAL DE EVALUACIONES ANTERIORES ── */}
-      {evaluacionesAnteriores.length > 0 && (
+      {/* ── HISTORIAL DE EVALUACIONES ANTERIORES (Excluye la que está visible en el veredicto actual) ── */}
+      {evaluacionesPrevias.length > 0 && (
         <div className="eval-historial">
           <h3 className="historial-titulo">
             <FiClipboard size={15} /> Historial de evaluaciones anteriores
           </h3>
-          {evaluacionesAnteriores.map((ev) => (
+          {evaluacionesPrevias.map((ev) => (
             <div key={ev.id} className={`historial-card ${ev.veredicto === 'Apto' ? 'h-apto' : 'h-no-apto'}`}>
               <div className="historial-head">
                 <div className="historial-veredicto-wrap">

@@ -231,6 +231,85 @@
 .exam-acciones {
   display: flex;
   gap: 6px;
+  align-items: center;
+}
+
+/* Botón de editar — azul suave */
+.btn-icon-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(30, 58, 138, 0.08);
+  color: #1e3a8a;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+}
+.btn-icon-edit:hover {
+  background: rgba(30, 58, 138, 0.16);
+  color: #1e3a8a;
+  transform: scale(1.1);
+}
+
+/* Botón de eliminar — rojo suave */
+.btn-icon-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.12s;
+}
+.btn-icon-delete:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #b91c1c;
+  transform: scale(1.1);
+}
+
+/* ── PAGINACIÓN ── */
+.exam-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 0 8px;
+  border-top: 1px solid var(--borde);
+  margin-top: 4px;
+}
+
+.pag-btn {
+  padding: 7px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: #fff;
+  color: var(--azul);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.pag-btn:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: var(--azul);
+}
+.pag-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pag-info {
+  font-size: 13px;
+  color: var(--texto-mut);
+  min-width: 110px;
+  text-align: center;
 }
 
 /* ── BADGES ── */

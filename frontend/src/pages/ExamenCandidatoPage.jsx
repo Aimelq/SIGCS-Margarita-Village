@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import './ExamenCandidatoPage.css';
 import { FiCheckCircle, FiLoader, FiClock, FiAlertTriangle } from 'react-icons/fi';
 
@@ -23,10 +23,27 @@ const ExamenCandidatoPage = () => {
 
   const cargarExamen = async () => {
     try {
-      const res = await axios.get(`/api/evaluacion/${token}`, {
-        headers: { 'Bypass-Tunnel-Reminder': 'true' }
-      });
-      setExamen(res.data);
+      const res = await api.get(`/api/evaluacion/${token}`);
+      // Normalizar las preguntas: parsear opciones si llegan como string JSON
+      const data = res.data;
+      if (data && Array.isArray(data.preguntas)) {
+        data.preguntas = data.preguntas.map(p => {
+          // Normalizar tipo: soportar valores antiguos de la DB
+          let tipo = p.tipo || 'abierta';
+          if (tipo === 'Opción múltiple' || tipo === 'Verdadero/Falso') tipo = 'multiple';
+          if (tipo === 'Desarrollo abierto') tipo = 'abierta';
+
+          // Parsear opciones si viene como string JSON
+          let opciones = p.opciones;
+          if (typeof opciones === 'string') {
+            try { opciones = JSON.parse(opciones); } catch { opciones = []; }
+          }
+          if (!Array.isArray(opciones)) opciones = [];
+
+          return { ...p, tipo, opciones };
+        });
+      }
+      setExamen(data);
       iniciarTemporizador(token);
     } catch (err) {
       setError(err.response?.data?.error || 'Error al cargar el examen. Es posible que el enlace no sea válido o haya expirado.');
@@ -106,9 +123,7 @@ const ExamenCandidatoPage = () => {
         }))
       };
 
-      await axios.post(`/api/evaluacion/${token}`, payload, {
-        headers: { 'Bypass-Tunnel-Reminder': 'true' }
-      });
+      await api.post(`/api/evaluacion/${token}`, payload);
       setFinalizado(true);
       localStorage.removeItem(`examen_inicio_${token}`); // Limpiar storage al finalizar
     } catch (err) {
@@ -180,7 +195,7 @@ const ExamenCandidatoPage = () => {
           <div key={p.examen_pregunta_id} className="pregunta-card">
             <h3>{index + 1}. {p.texto}</h3>
             
-            {(p.tipo === 'Opción múltiple' || p.tipo === 'Verdadero/Falso') ? (
+            {(p.tipo === 'multiple') ? (
               <div className="opciones-lista">
                 {p.opciones.map((op, i) => (
                   <label key={i} className="opcion-label">

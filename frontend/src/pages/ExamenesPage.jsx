@@ -210,6 +210,19 @@ const ExamenesPage = () => {
   const totalAbiertas = preguntas.filter(p => p.tipo === 'abierta').length
   const totalMultiple = preguntas.filter(p => p.tipo === 'multiple').length
 
+  // Paginación: calcular páginas y preguntas visibles
+  const totalPaginas = Math.max(1, Math.ceil(preguntas.length / ITEMS_POR_PAGINA))
+  const preguntasPagina = preguntas.slice(
+    (paginaActual - 1) * ITEMS_POR_PAGINA,
+    paginaActual * ITEMS_POR_PAGINA
+  )
+
+  // Resetear página al cambiar filtro
+  const cambiarFiltro = (tipo) => {
+    setFiltroTipo(tipo)
+    setPaginaActual(1)
+  }
+
   return (
     <div className="examenes-page">
 
@@ -263,19 +276,19 @@ const ExamenesPage = () => {
         <FiFilter size={14} className="exam-filter-icon" />
         <button
           className={`exam-filter-btn ${filtroTipo === '' ? 'activo' : ''}`}
-          onClick={() => setFiltroTipo('')}
+          onClick={() => cambiarFiltro('')}
         >
           Todas
         </button>
         <button
           className={`exam-filter-btn ${filtroTipo === 'abierta' ? 'activo' : ''}`}
-          onClick={() => setFiltroTipo('abierta')}
+          onClick={() => cambiarFiltro('abierta')}
         >
           Abiertas
         </button>
         <button
           className={`exam-filter-btn ${filtroTipo === 'multiple' ? 'activo' : ''}`}
-          onClick={() => setFiltroTipo('multiple')}
+          onClick={() => cambiarFiltro('multiple')}
         >
           Selección múltiple
         </button>
@@ -310,9 +323,9 @@ const ExamenesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {preguntas.map((p, idx) => (
+              {preguntasPagina.map((p, idx) => (
                 <tr key={p.id}>
-                  <td className="exam-num-cell">{idx + 1}</td>
+                  <td className="exam-num-cell">{(paginaActual - 1) * ITEMS_POR_PAGINA + idx + 1}</td>
                   <td>
                     <span className="exam-enunciado">{p.texto}</span>
                     {/* Muestra vista previa de las opciones en preguntas de selección múltiple */}
@@ -341,7 +354,7 @@ const ExamenesPage = () => {
                       : <span className="text-muted">—</span>}
                   </td>
                   <td className="text-muted exam-creador-cell">
-                    {p.nombre_creador || '—'}
+                    {p.nombre_creador || 'Sistema'}
                   </td>
                   <td>
                     <div className="exam-acciones">
@@ -365,6 +378,28 @@ const ExamenesPage = () => {
               ))}
             </tbody>
           </table>
+        )}
+        {/* Controles de paginación */}
+        {!cargando && preguntas.length > ITEMS_POR_PAGINA && (
+          <div className="exam-paginacion">
+            <button
+              className="pag-btn"
+              onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
+              disabled={paginaActual === 1}
+            >
+              ← Anterior
+            </button>
+            <span className="pag-info">
+              Página <strong>{paginaActual}</strong> de <strong>{totalPaginas}</strong>
+            </span>
+            <button
+              className="pag-btn"
+              onClick={() => setPaginaActual(p => Math.min(totalPaginas, p + 1))}
+              disabled={paginaActual === totalPaginas}
+            >
+              Siguiente →
+            </button>
+          </div>
         )}
       </div>
 

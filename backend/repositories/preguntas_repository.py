@@ -14,7 +14,7 @@ class PreguntasRepository:
                     p.id, p.texto, p.tipo, p.opciones_json,
                     p.respuesta_correcta, p.creado_por,
                     p.created_at, p.updated_at,
-                    u.nombre AS nombre_creador
+                    COALESCE(u.nombre, 'Sistema') AS nombre_creador
                 FROM preguntas p
                 LEFT JOIN usuarios u ON u.id = p.creado_por
                 {where}
@@ -37,7 +37,7 @@ class PreguntasRepository:
                     p.id, p.texto, p.tipo, p.opciones_json,
                     p.respuesta_correcta, p.creado_por,
                     p.created_at, p.updated_at,
-                    u.nombre AS nombre_creador
+                    COALESCE(u.nombre, 'Sistema') AS nombre_creador
                 FROM preguntas p
                 LEFT JOIN usuarios u ON u.id = p.creado_por
                 WHERE p.id = %s

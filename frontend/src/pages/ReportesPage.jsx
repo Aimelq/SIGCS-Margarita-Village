@@ -17,7 +17,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   FiBarChart2, FiTrendingUp, FiUsers, FiCheckCircle,
   FiClock, FiFileText, FiDownload, FiLoader, FiActivity,
-  FiAward, FiRotateCcw, FiCalendar
+  FiAward, FiRotateCcw, FiCalendar, FiCheck, FiX, FiAlertCircle, FiXCircle
 } from 'react-icons/fi';
 import api from '../api/axios';
 import './ReportesPage.css';
@@ -82,10 +82,25 @@ const ReportesPage = () => {
     }
   };
 
+  // Formatea etiquetas de mes (ej. "2026-11" -> "Nov 2026")
+  const formatearMes = (mesStr) => {
+    if (!mesStr) return '';
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const partes = String(mesStr).split('-');
+    if (partes.length >= 2) {
+      const anio = partes[0];
+      const mesNum = parseInt(partes[1], 10);
+      if (mesNum >= 1 && mesNum <= 12) {
+        return `${meses[mesNum - 1]} ${anio}`;
+      }
+    }
+    return mesStr;
+  };
+
   // Calcula la altura proporcional de las barras de evolución mensual
   const calcularAlturaEvol = (cantidad, max) => {
-    if (!max || max === 0) return 4;
-    return Math.max(4, Math.round((cantidad / max) * 88));
+    if (!max || max === 0) return 16;
+    return Math.max(20, Math.round((cantidad / max) * 75));
   };
 
   if (cargando) {
@@ -245,9 +260,12 @@ const ReportesPage = () => {
         <div className="rep-card">
           <div className="rep-card-header">
             <h3 className="rep-card-title">
-              <FiTrendingUp size={15} /> Embudo de Reclutamiento (Conversion Funnel)
+              <FiTrendingUp size={15} /> Embudo de Reclutamiento
             </h3>
           </div>
+          <p className="rep-card-note">
+            Muestra cuántos candidatos avanzaron a cada etapa del proceso. Cada barra representa el porcentaje que llegó a esa fase del total inicial.
+          </p>
           <div className="rep-funnel">
             {embudo.map((etapa, i) => (
               <div className="rep-funnel-step" key={i}>
@@ -322,17 +340,21 @@ const ReportesPage = () => {
               <FiCalendar size={15} /> Evolución Mensual de Postulaciones
             </h3>
           </div>
+          <p className="rep-card-note">
+            Volumen de nuevos aspirantes registrados agrupados por mes calendario.
+          </p>
           {evolucion_mensual.length > 0 ? (
             <div className="rep-evol-chart">
               {evolucion_mensual.map((mes, i) => (
                 <div className="rep-evol-col" key={i}>
-                  <span className="rep-evol-val">{mes.cantidad}</span>
+                  <span className="rep-evol-val">{mes.cantidad} {mes.cantidad === 1 ? 'cand.' : 'cand.'}</span>
                   <div
                     className="rep-evol-bar"
-                    style={{ height: calcularAlturaEvol(mes.cantidad, maxEvol) }}
+                    style={{ height: `${calcularAlturaEvol(mes.cantidad, maxEvol)}px` }}
+                    title={`${formatearMes(mes.mes)}: ${mes.cantidad} postulaciones`}
                   />
                   <span className="rep-evol-mes">
-                    {mes.mes?.substring(5) || mes.mes}
+                    {formatearMes(mes.mes)}
                   </span>
                 </div>
               ))}
@@ -409,20 +431,25 @@ const ReportesPage = () => {
           <div style={{
             marginTop: 14,
             display: 'flex',
-            gap: 8,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: 16,
             fontSize: 12,
             color: 'var(--texto-mut)',
             paddingTop: 12,
             borderTop: '1px solid var(--borde)'
           }}>
-            <span>
-              ✅ Aprobados (≥14 pts): <strong style={{ color: '#22c55e' }}>{rendimiento_pruebas.aprobados}</strong>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <FiCheckCircle size={14} style={{ color: '#22c55e' }} />
+              Aprobados (≥14 pts): <strong style={{ color: '#22c55e', marginLeft: 3 }}>{rendimiento_pruebas.aprobados}</strong>
             </span>
-            <span style={{ marginLeft: 'auto' }}>
-              ❌ Reprobados: <strong style={{ color: '#ef4444' }}>{rendimiento_pruebas.reprobados}</strong>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <FiXCircle size={14} style={{ color: '#ef4444' }} />
+              Reprobados: <strong style={{ color: '#ef4444', marginLeft: 3 }}>{rendimiento_pruebas.reprobados}</strong>
             </span>
-            <span>
-              ⏳ Pendientes: <strong>{rendimiento_pruebas.pendientes}</strong>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}>
+              <FiClock size={14} style={{ color: '#f59e0b' }} />
+              Pendientes: <strong style={{ marginLeft: 3 }}>{rendimiento_pruebas.pendientes}</strong>
             </span>
           </div>
         </div>

@@ -153,9 +153,9 @@ const PruebasTab = ({ cedula }) => {
                       <div key={p.examen_pregunta_id} className={`item-respuesta ${p.es_correcta === true ? 'correcta' : p.es_correcta === false ? 'incorrecta' : 'abierta'}`}>
                         <div className="pregunta-header">
                           <span className="num-pregunta">#{idx + 1}</span>
-                          <span className="tipo-tag">{p.tipo}</span>
-                          {p.tipo === 'Desarrollo abierto' ? (
-                            <span className="pts-tag cualitativa">Pregunta Cualitativa</span>
+                          <span className="tipo-tag">{p.tipo === 'abierta' || p.tipo === 'Desarrollo abierto' ? 'Abierta' : 'Múltiple'}</span>
+                          {p.tipo === 'abierta' || p.tipo === 'Desarrollo abierto' ? (
+                            <span className="pts-tag cualitativa">Cualitativa (No cuantitativa)</span>
                           ) : (
                             <span className="pts-tag">{p.puntaje_obtenido !== null ? p.puntaje_obtenido : 0} / {p.puntaje_max} pts</span>
                           )}
